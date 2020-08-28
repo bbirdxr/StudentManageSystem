@@ -1,9 +1,8 @@
 package cn.edu.seu.historycontest.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.util.Date;
-import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,18 +33,24 @@ public class User implements Serializable {
      */
     private String sid;
 
+    private String cardId;
+
     /**
      * 密码/一卡通号
      */
     private String password;
+
+    private String name;
 
     /**
      * 角色编号
      */
     private Integer roleId;
 
+    @TableField(fill = FieldFill.INSERT)
     private Date gmtCreate;
 
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date gmtModified;
 
 
