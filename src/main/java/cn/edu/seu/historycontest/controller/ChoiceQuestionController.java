@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2020-08-28
  */
 @RestController
-@RequestMapping("/historycontest/choice-question")
+@RequestMapping("/api/choice-question")
 public class ChoiceQuestionController {
 
 }
