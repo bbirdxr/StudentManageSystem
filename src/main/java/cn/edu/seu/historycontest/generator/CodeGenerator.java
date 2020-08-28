@@ -49,7 +49,7 @@ public class CodeGenerator {
 
         // 5、策略配置
         StrategyConfig strategy = new StrategyConfig();
-        strategy.setInclude("hc_user", "hc_user_answer", "hc_judge_question", "hc_choice_question");//设置要映射的表名
+        strategy.setInclude("hc_user", "hc_paper", "hc_judge_question", "hc_choice_question");//设置要映射的表名
         strategy.setNaming(NamingStrategy.underline_to_camel);//数据库表映射到实体的命名策略
         strategy.setTablePrefix("hc_");//设置表前缀不生成
 
