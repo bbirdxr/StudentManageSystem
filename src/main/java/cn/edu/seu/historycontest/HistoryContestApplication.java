@@ -1,9 +1,11 @@
 package cn.edu.seu.historycontest;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
+@MapperScan("cn.edu.seu.historycontest.mapper")
 public class HistoryContestApplication {
 
     public static void main(String[] args) {
