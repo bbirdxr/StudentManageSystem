@@ -2,6 +2,7 @@ package cn.edu.seu.historycontest.mapper;
 
 import cn.edu.seu.historycontest.entity.Paper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.springframework.stereotype.Repository;
 
 /**
  * <p>
@@ -11,6 +12,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author ${author}
  * @since 2020-08-28
  */
+@Repository
 public interface PaperMapper extends BaseMapper<Paper> {
 
 }

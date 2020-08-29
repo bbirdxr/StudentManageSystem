@@ -42,10 +42,8 @@ public class User implements Serializable {
 
     private String name;
 
-    /**
-     * 角色编号
-     */
-    private Integer roleId;
+    private String role;
+    private String status;
 
     @TableField(fill = FieldFill.INSERT)
     private Date gmtCreate;

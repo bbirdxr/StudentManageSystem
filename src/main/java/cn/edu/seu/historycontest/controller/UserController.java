@@ -27,10 +27,10 @@ public class UserController {
     @GetMapping
     public void insert() {
         User user = new User();
-        user.setSid("JS219100");
+        user.setSid("JS219109");
         user.setName("李梅");
         user.setCardId("213102");
-        user.setRoleId(0);
+        user.setRole("学生");
         userService.save(user);
     }
 

@@ -27,8 +27,6 @@ public class Paper implements Serializable {
 
     private Long uid;
 
-    private Integer status;
-
     private Date startTime;
 
     private String choiceQuestion;
