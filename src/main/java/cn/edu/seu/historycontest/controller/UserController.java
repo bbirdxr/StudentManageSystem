@@ -57,6 +57,12 @@ public class UserController {
         userService.removeById(id);
     }
 
+    @DeleteMapping("student")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteStudents(@RequestBody List<Long> ids) {
+        userService.removeByIds(ids);
+    }
+
     @PutMapping("student/insert")
     @PreAuthorize("hasRole('ADMIN')")
     public void insertStudent(@RequestBody EditStudentRequest student) {
