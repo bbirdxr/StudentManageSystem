@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.util.Date;
 import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -29,9 +31,11 @@ public class JudgeQuestion implements Serializable {
 
     private Integer answer;
 
+    @JsonIgnore
     @TableField(fill = FieldFill.INSERT)
     private Date gmtCreate;
 
+    @JsonIgnore
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date gmtModified;
 

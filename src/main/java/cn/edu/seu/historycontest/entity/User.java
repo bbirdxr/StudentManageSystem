@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.util.Date;
 import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -38,6 +41,7 @@ public class User implements Serializable {
     /**
      * 密码/一卡通号
      */
+    @JsonIgnore
     private String password;
 
     private String name;
@@ -45,9 +49,11 @@ public class User implements Serializable {
     private String role;
     private String status;
 
+    @JsonIgnore
     @TableField(fill = FieldFill.INSERT)
     private Date gmtCreate;
 
+    @JsonIgnore
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date gmtModified;
 

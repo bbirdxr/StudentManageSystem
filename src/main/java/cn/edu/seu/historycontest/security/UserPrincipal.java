@@ -2,6 +2,7 @@ package cn.edu.seu.historycontest.security;
 
 import cn.edu.seu.historycontest.config.SecurityConfig;
 import cn.edu.seu.historycontest.entity.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,6 +25,8 @@ public class UserPrincipal implements UserDetails {
     private String cardId;
     private String name;
     private String password;
+    private String role;
+    private String status;
 
     private Collection<? extends GrantedAuthority> authorities;
 
@@ -31,7 +34,8 @@ public class UserPrincipal implements UserDetails {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(user.getRole()));
         authorities.add(new SimpleGrantedAuthority(user.getStatus()));
-        return new UserPrincipal(user.getId(), user.getSid(), user.getCardId(), user.getName(), user.getPassword(), authorities);
+        return new UserPrincipal(user.getId(), user.getSid(), user.getCardId(), user.getName(), user.getPassword(),
+                user.getRole(), user.getStatus(), authorities);
     }
 
     @Override
