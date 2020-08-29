@@ -32,4 +32,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         queryWrapper.eq("role", Constants.ROLE_STUDENT);
         return userMapper.selectList(queryWrapper);
     }
+
+    @Override
+    public void editStudent(User user) {
+        userMapper.updateById(user);
+    }
 }
