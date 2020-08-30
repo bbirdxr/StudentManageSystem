@@ -24,14 +24,12 @@ import java.util.List;
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
-    @Autowired
-    private UserMapper userMapper;
 
     @Override
     public List<User> getAllStudent() {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("role", Constants.ROLE_STUDENT);
-        return userMapper.selectList(queryWrapper);
+        return list(queryWrapper);
     }
 
     @Override
@@ -40,12 +38,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("role", Constants.ROLE_STUDENT);
 
-        userMapper.selectPage(page, queryWrapper);
+        page(page, queryWrapper);
         return page;
     }
 
     @Override
     public void editStudent(User user) {
-        userMapper.updateById(user);
+        updateById(user);
     }
 }

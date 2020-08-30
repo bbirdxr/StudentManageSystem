@@ -7,6 +7,7 @@ import cn.edu.seu.historycontest.entity.User;
 import cn.edu.seu.historycontest.payload.EditStudentRequest;
 import cn.edu.seu.historycontest.payload.GetPageRequest;
 import cn.edu.seu.historycontest.payload.GetPageResponse;
+import cn.edu.seu.historycontest.security.CurrentUser;
 import cn.edu.seu.historycontest.security.UserPrincipal;
 import cn.edu.seu.historycontest.service.UserService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -34,7 +35,7 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
-    public User getInfo(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public User getInfo(@CurrentUser UserPrincipal userPrincipal) {
         User user = new User();
         BeanUtils.copyProperties(userPrincipal, user);
         user.setPassword(null);
