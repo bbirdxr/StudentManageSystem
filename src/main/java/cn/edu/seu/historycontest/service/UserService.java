@@ -1,6 +1,7 @@
 package cn.edu.seu.historycontest.service;
 
 import cn.edu.seu.historycontest.entity.User;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -15,5 +16,6 @@ import java.util.List;
  */
 public interface UserService extends IService<User> {
     List<User> getAllStudent();
+    Page<User> getStudentPage(long current, long size);
     void editStudent(User user);
 }

@@ -5,6 +5,7 @@ import cn.edu.seu.historycontest.entity.User;
 import cn.edu.seu.historycontest.mapper.UserMapper;
 import cn.edu.seu.historycontest.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("role", Constants.ROLE_STUDENT);
         return userMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public Page<User> getStudentPage(long current, long size) {
+        Page<User> page = new Page<>(current, size);
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("role", Constants.ROLE_STUDENT);
+
+        userMapper.selectPage(page, queryWrapper);
+        return page;
     }
 
     @Override
