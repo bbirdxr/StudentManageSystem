@@ -2,7 +2,9 @@ package cn.edu.seu.historycontest;
 
 import cn.edu.seu.historycontest.controller.ChoiceQuestionController;
 import cn.edu.seu.historycontest.entity.ChoiceQuestion;
+import cn.edu.seu.historycontest.entity.JudgeQuestion;
 import cn.edu.seu.historycontest.mapper.ChoiceQuestionMapper;
+import cn.edu.seu.historycontest.mapper.JudgeQuestionMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +21,9 @@ class HistoryContestApplicationTests {
 
     @Autowired
     private ChoiceQuestionMapper choiceQuestionMapper;
+
+    @Autowired
+    private JudgeQuestionMapper judgeQuestionMapper;
 
     @Test
     void addRandomChoiceQuestion() {
@@ -51,4 +56,26 @@ class HistoryContestApplicationTests {
         return (int) (Math.random() * (max - min) + min);
     }
 
+    @Test
+    void addRandomJudgeQuestion() {
+        for (int i = 0; i < 200; i++) {
+            JudgeQuestion judgeQuestion = new JudgeQuestion();
+
+            int a = getRandomInteger(0, 10);
+            int b = getRandomInteger(0, 10);
+
+            boolean right = (int) getRandomInteger(0, 2) == 0;
+            if (right) {
+                judgeQuestion.setQuestion(a + "+" + b + "=" + (a + b) + "?");
+                judgeQuestion.setAnswer(1);
+            } else {
+                int ans = getRandomInteger(0, 20);
+                while(ans == a + b) ans = getRandomInteger(0, 20);
+                judgeQuestion.setQuestion(a + "+" + b + "=" + ans + "?");
+                judgeQuestion.setAnswer(0);
+            }
+
+            judgeQuestionMapper.insert(judgeQuestion);
+        }
+    }
 }
