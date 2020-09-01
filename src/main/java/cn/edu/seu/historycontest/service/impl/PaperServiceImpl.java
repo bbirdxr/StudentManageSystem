@@ -6,7 +6,6 @@ import cn.edu.seu.historycontest.entity.JudgeQuestion;
 import cn.edu.seu.historycontest.entity.Paper;
 import cn.edu.seu.historycontest.entity.User;
 import cn.edu.seu.historycontest.exception.ForbiddenException;
-import cn.edu.seu.historycontest.exception.ResourceNotFoundException;
 import cn.edu.seu.historycontest.mapper.PaperMapper;
 import cn.edu.seu.historycontest.payload.DetailedPaper;
 import cn.edu.seu.historycontest.security.UserPrincipal;
@@ -19,13 +18,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -50,6 +44,10 @@ public class PaperServiceImpl extends ServiceImpl<PaperMapper, Paper> implements
 
     @Override
     public DetailedPaper generatePaper(UserPrincipal userPrincipal) {
+        Paper lastPaper = getPaperFromUid(userPrincipal.getId());
+        if (lastPaper != null)
+            removeById(lastPaper.getId());
+
         User user = new User();
         user.setId(userPrincipal.getId());
         user.setStatus(Constants.STATUS_GENERATED);
@@ -87,46 +85,32 @@ public class PaperServiceImpl extends ServiceImpl<PaperMapper, Paper> implements
         detailedPaper.setId(paper.getId());
         detailedPaper.setChoiceQuestions(choiceQuestions);
         detailedPaper.setJudgeQuestions(judgeQuestions);
+        detailedPaper.setChoiceAnswerSheet(Arrays.stream(paper.getChoiceAnswer().split(","))
+                .map(Integer::valueOf).collect(Collectors.toList()));
+        detailedPaper.setJudgeAnswerSheet(Arrays.stream(paper.getJudgeAnswer().split(","))
+                .map(Integer::valueOf).collect(Collectors.toList()));
         return detailedPaper;
     }
 
     @Override
-    public void calibrateTime(Long userId, Date time) {
-        User user = new User();
-        user.setId(userId);
-        user.setStatus(Constants.STATUS_STARTED);
-        userService.updateById(user);
-
-        Paper paper = getPaperFromUid(userId);
-        paper.setStartTime(time);
-        updateById(paper);
+    public DetailedPaper getDetailedPaper(Long userId) {
+        return getDetailedPaper(userId, getPaperFromUid(userId));
     }
 
-    @Override
-    public DetailedPaper getDetailedPaper(Long userId) {
-        Paper paper = getPaperFromUid(userId);
-
+    public DetailedPaper getDetailedPaper(Long userId, Paper paper) {
         DetailedPaper detailedPaper = new DetailedPaper();
+        detailedPaper.setUid(userId);
         detailedPaper.setId(paper.getId());
-
 
         if (paper.getChoiceQuestion() != null) {
             List<ChoiceQuestion> choiceQuestions = Arrays.stream(paper.getChoiceQuestion().split(","))
-                    .map(s -> {
-                        ChoiceQuestion question = choiceQuestionService.getById(s);
-                        question.setAnswer(null);
-                        return question;
-                    }).collect(Collectors.toList());
+                    .map(choiceQuestionService::getById).collect(Collectors.toList());
             detailedPaper.setChoiceQuestions(choiceQuestions);
         }
 
         if (paper.getJudgeQuestion() != null) {
             List<JudgeQuestion> judgeQuestions = Arrays.stream(paper.getJudgeQuestion().split(","))
-                    .map(s -> {
-                        JudgeQuestion question = judgeQuestionService.getById(s);
-                        question.setAnswer(null);
-                        return question;
-                    }).collect(Collectors.toList());
+                    .map(judgeQuestionService::getById).collect(Collectors.toList());
             detailedPaper.setJudgeQuestions(judgeQuestions);
         }
 
@@ -144,8 +128,53 @@ public class PaperServiceImpl extends ServiceImpl<PaperMapper, Paper> implements
         }
 
         detailedPaper.setStartTime(paper.getStartTime().getTime());
+        detailedPaper.setScore(paper.getScore());
 
         return detailedPaper;
+    }
+
+    @Override
+    public void submitPaper(UserPrincipal user, List<Integer> choiceAnswers, List<Integer> judgeAnswers) {
+        Paper paper = getPaperFromUid(user.getId());
+        if (new Date().getTime() - paper.getStartTime().getTime() > Constants.TIME_LIMIT)
+            throw new ForbiddenException("超时");
+
+        user.setStatus(Constants.STATUS_SUBMITTED);
+        userService.updateById(user.toUser());
+
+        int score = 0;
+
+        DetailedPaper detailedPaper = getDetailedPaper(user.getId(), paper);
+        for (int i = 0; i < detailedPaper.getChoiceQuestions().size(); i++) {
+            if (Objects.equals(detailedPaper.getChoiceQuestions().get(i).getAnswer(),
+                    choiceAnswers.get(i)))
+                score += Constants.CHOICE_QUESTION_SCORE;
+        }
+        for (int i = 0; i < detailedPaper.getJudgeQuestions().size(); i++) {
+            if (Objects.equals(detailedPaper.getJudgeQuestions().get(i).getAnswer(),
+                    judgeAnswers.get(i)))
+                score += Constants.JUDGE_QUESTION_SCORE;
+        }
+
+        paper.setChoiceAnswer(choiceAnswers.stream().map(String::valueOf).collect(Collectors.joining(",")));
+        paper.setJudgeAnswer(judgeAnswers.stream().map(String::valueOf).collect(Collectors.joining(",")));
+        paper.setScore(score);
+        updateById(paper);
+    }
+
+    @Override
+    public Integer getScore(UserPrincipal userPrincipal) {
+        return getPaperFromUid(userPrincipal.getId()).getScore();
+    }
+
+    @Override
+    public void calibrateTime(UserPrincipal userPrincipal, Date startTime) {
+        userPrincipal.setStatus(Constants.STATUS_STARTED);
+        userService.updateById(userPrincipal.toUser());
+
+        Paper paper = getPaperFromUid(userPrincipal.getId());
+        paper.setStartTime(startTime);
+        updateById(paper);
     }
 
     private Paper getPaperFromUid(Long userId) {

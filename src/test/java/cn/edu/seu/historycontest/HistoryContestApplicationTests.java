@@ -39,7 +39,9 @@ class HistoryContestApplicationTests {
             answers[answerIndex] = numA + numB;
             for (int j = 0; j < 4; j++)
                 if (answers[j] == 0)
-                    answers[j] = getRandomInteger(5, 25);
+                    do {
+                        answers[j] = getRandomInteger(5, 25);
+                    } while (answers[j] == numA + numB);
 
             choiceQuestion.setChoiceA(String.valueOf(answers[0]));
             choiceQuestion.setChoiceB(String.valueOf(answers[1]));

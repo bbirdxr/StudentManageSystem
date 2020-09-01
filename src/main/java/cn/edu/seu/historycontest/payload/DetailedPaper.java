@@ -10,10 +10,12 @@ import java.util.List;
 public class DetailedPaper {
 
     private Long id;
+    private Long uid;
     private Long startTime;
     private List<ChoiceQuestion> choiceQuestions;
     private List<JudgeQuestion> judgeQuestions;
     private List<Integer> choiceAnswerSheet;
     private List<Integer> judgeAnswerSheet;
+    private Integer score;
 
 }

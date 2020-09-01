@@ -1,14 +1,16 @@
 package cn.edu.seu.historycontest.controller;
 
 
-import cn.edu.seu.historycontest.payload.CalibrateTimeRequest;
 import cn.edu.seu.historycontest.payload.DetailedPaper;
+import cn.edu.seu.historycontest.payload.SubmitRequest;
 import cn.edu.seu.historycontest.security.CurrentUser;
 import cn.edu.seu.historycontest.security.UserPrincipal;
 import cn.edu.seu.historycontest.service.PaperService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
 
 @RestController
 @RequestMapping("/api/paper")
@@ -18,22 +20,33 @@ public class PaperController {
     private PaperService paperService;
 
     @GetMapping("generate")
-    @PreAuthorize("hasRole('STUDENT') and hasAuthority('STATUS_NOT_START')")
+    @PreAuthorize("hasRole('STUDENT') and not hasAuthority('STATUS_SUBMITTED')")
     public DetailedPaper generatePaper(@CurrentUser UserPrincipal userPrincipal) {
         return paperService.generatePaper(userPrincipal);
     }
 
-    @PostMapping("calibrate")
-    @PreAuthorize("hasRole('STUDENT') and hasAuthority('STATUS_GENERATED')")
-    public void calibrateTime(@CurrentUser UserPrincipal userPrincipal, @RequestBody CalibrateTimeRequest calibrateTimeRequest) {
-        paperService.calibrateTime(userPrincipal.getId(), calibrateTimeRequest.getTime());
+    @PutMapping("submit")
+    @PreAuthorize("hasRole('STUDENT') and hasAuthority('STATUS_STARTED')")
+    public void submit(@CurrentUser UserPrincipal userPrincipal, @RequestBody SubmitRequest submitRequest) {
+        paperService.submitPaper(userPrincipal, submitRequest.getChoice(), submitRequest.getJudge());
     }
 
-    @GetMapping
-    @PreAuthorize("hasRole('STUDENT') and hasAnyAuthority('STATUS_STARTED', 'STATUS_SUBMITTED')")
-    public DetailedPaper getPaper(@CurrentUser UserPrincipal userPrincipal) {
+    @GetMapping("complete")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('STATUS_SUBMITTED')")
+    public DetailedPaper getCompletePaper(@CurrentUser UserPrincipal userPrincipal) {
         return paperService.getDetailedPaper(userPrincipal.getId());
     }
 
+    @GetMapping("score")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('STATUS_SUBMITTED')")
+    public Integer getScore(@CurrentUser UserPrincipal userPrincipal) {
+        return paperService.getScore(userPrincipal);
+    }
+
+    @PostMapping("calibrate")
+    @PreAuthorize("hasRole('STUDENT') and hasAuthority('STATUS_GENERATED')")
+    public void calibrateTime(@CurrentUser UserPrincipal userPrincipal, @RequestBody Date startTime) {
+        paperService.calibrateTime(userPrincipal, startTime);
+    }
 }
 

@@ -5,6 +5,7 @@ import cn.edu.seu.historycontest.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,6 +37,12 @@ public class UserPrincipal implements UserDetails {
         authorities.add(new SimpleGrantedAuthority(user.getStatus()));
         return new UserPrincipal(user.getId(), user.getSid(), user.getCardId(), user.getName(), user.getPassword(),
                 user.getRole(), user.getStatus(), authorities);
+    }
+
+    public User toUser() {
+        User user = new User();
+        BeanUtils.copyProperties(this, user);
+        return user;
     }
 
     @Override
