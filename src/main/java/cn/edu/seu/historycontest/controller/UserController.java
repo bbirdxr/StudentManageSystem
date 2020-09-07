@@ -7,8 +7,10 @@ import cn.edu.seu.historycontest.entity.User;
 import cn.edu.seu.historycontest.payload.EditStudentRequest;
 import cn.edu.seu.historycontest.payload.GetPageRequest;
 import cn.edu.seu.historycontest.payload.GetPageResponse;
+import cn.edu.seu.historycontest.payload.StudentListResponse;
 import cn.edu.seu.historycontest.security.CurrentUser;
 import cn.edu.seu.historycontest.security.UserPrincipal;
+import cn.edu.seu.historycontest.service.PaperService;
 import cn.edu.seu.historycontest.service.UserService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.BeanUtils;
@@ -18,6 +20,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -34,6 +39,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private PaperService paperService;
+
     @GetMapping
     public User getInfo(@CurrentUser UserPrincipal userPrincipal) {
         User user = new User();
@@ -48,14 +56,17 @@ public class UserController {
         GetPageResponse pageResponse = new GetPageResponse();
         Page<User> page = userService.getStudentPage(pageRequest.getPageIndex(), pageRequest.getPageSize());
         pageResponse.setTotal(page.getTotal());
-        pageResponse.setList(page.getRecords());
+        pageResponse.setList(page.getRecords().stream().map(user ->
+                StudentListResponse.ofUser(user, paperService.getScore(user.getId()))).collect(Collectors.toList()));
         return pageResponse;
     }
 
     @GetMapping("student/list")
     @PreAuthorize("hasRole('ADMIN')")
-    public List<User> getStudentList() {
-        return userService.getAllStudent();
+    public List<StudentListResponse> getStudentList() {
+        List<User> student = userService.getAllStudent();
+        return student.stream().map(user ->
+                StudentListResponse.ofUser(user, paperService.getScore(user.getId()))).collect(Collectors.toList());
     }
 
     @PutMapping("student/edit")

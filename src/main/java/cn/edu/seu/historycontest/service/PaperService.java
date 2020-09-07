@@ -22,5 +22,6 @@ public interface PaperService extends IService<Paper> {
     DetailedPaper getDetailedPaper(Long userId);
     void submitPaper(UserPrincipal user, List<Integer> choiceAnswers, List<Integer> judgeAnswers);
     Integer getScore(UserPrincipal userPrincipal);
+    Integer getScore(Long uid);
     void calibrateTime(UserPrincipal userPrincipal, Date startTime);
 }

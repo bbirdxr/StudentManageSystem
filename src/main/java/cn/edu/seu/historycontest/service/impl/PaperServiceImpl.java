@@ -44,9 +44,9 @@ public class PaperServiceImpl extends ServiceImpl<PaperMapper, Paper> implements
 
     @Override
     public DetailedPaper generatePaper(UserPrincipal userPrincipal) {
-        Paper lastPaper = getPaperFromUid(userPrincipal.getId());
-        if (lastPaper != null)
-            removeById(lastPaper.getId());
+        QueryWrapper<Paper> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("uid", userPrincipal.getId());
+        remove(queryWrapper);
 
         User user = new User();
         user.setId(userPrincipal.getId());
@@ -164,7 +164,12 @@ public class PaperServiceImpl extends ServiceImpl<PaperMapper, Paper> implements
 
     @Override
     public Integer getScore(UserPrincipal userPrincipal) {
-        return getPaperFromUid(userPrincipal.getId()).getScore();
+        return getScore(userPrincipal.getId());
+    }
+
+    @Override
+    public Integer getScore(Long uid) {
+        return getPaperFromUid(uid).getScore();
     }
 
     @Override
