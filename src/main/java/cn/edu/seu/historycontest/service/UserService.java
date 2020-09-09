@@ -18,4 +18,5 @@ public interface UserService extends IService<User> {
     List<User> getAllStudent();
     Page<User> getStudentPage(long current, long size);
     void editStudent(User user);
+    void insertStudent(User user);
 }

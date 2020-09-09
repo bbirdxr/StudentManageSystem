@@ -26,6 +26,7 @@ public class UserPrincipal implements UserDetails {
     private String cardId;
     private String name;
     private String password;
+    private Integer department;
     private String role;
     private String status;
 
@@ -36,7 +37,7 @@ public class UserPrincipal implements UserDetails {
         authorities.add(new SimpleGrantedAuthority(user.getRole()));
         authorities.add(new SimpleGrantedAuthority(user.getStatus()));
         return new UserPrincipal(user.getId(), user.getSid(), user.getCardId(), user.getName(), user.getPassword(),
-                user.getRole(), user.getStatus(), authorities);
+                user.getDepartment(), user.getRole(), user.getStatus(), authorities);
     }
 
     public User toUser() {

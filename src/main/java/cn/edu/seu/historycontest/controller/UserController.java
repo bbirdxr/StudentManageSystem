@@ -94,9 +94,7 @@ public class UserController {
     public void insertStudent(@RequestBody EditStudentRequest student) {
         User user = new User();
         BeanUtils.copyProperties(student, user);
-        user.setRole(Constants.ROLE_STUDENT);
-        user.setStatus(Constants.STATUS_NOT_START);
-        userService.save(user);
+        userService.insertStudent(user);
     }
 
 }

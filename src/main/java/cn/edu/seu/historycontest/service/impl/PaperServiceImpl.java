@@ -169,7 +169,10 @@ public class PaperServiceImpl extends ServiceImpl<PaperMapper, Paper> implements
 
     @Override
     public Integer getScore(Long uid) {
-        return getPaperFromUid(uid).getScore();
+        Paper paper = getPaperFromUid(uid);
+        if (paper == null)
+            return -1;
+        return paper.getScore();
     }
 
     @Override

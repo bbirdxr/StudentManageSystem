@@ -6,7 +6,6 @@ import java.util.Date;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -16,40 +15,21 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author ${author}
- * @since 2020-08-28
+ * @since 2020-09-09
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("hc_user")
-public class User implements Serializable {
+@TableName("hc_department")
+public class Department implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 自增ID
-     */
     @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    private Integer id;
 
-    /**
-     * 学号
-     */
-    private String sid;
-
-    private String cardId;
-
-    /**
-     * 密码/一卡通号
-     */
-    @JsonIgnore
-    private String password;
+    private String prefix;
 
     private String name;
-
-    private String role;
-    private String status;
-
-    private Integer department;
 
     @JsonIgnore
     @TableField(fill = FieldFill.INSERT)
@@ -59,5 +39,9 @@ public class User implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date gmtModified;
 
+    public Department(String prefix, String name) {
+        setPrefix(prefix);
+        setName(name);
+    }
 
 }

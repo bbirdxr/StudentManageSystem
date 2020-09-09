@@ -1,8 +1,10 @@
 package cn.edu.seu.historycontest.service.impl;
 
 import cn.edu.seu.historycontest.Constants;
+import cn.edu.seu.historycontest.entity.Department;
 import cn.edu.seu.historycontest.entity.User;
 import cn.edu.seu.historycontest.mapper.UserMapper;
+import cn.edu.seu.historycontest.service.DepartmentService;
 import cn.edu.seu.historycontest.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -10,7 +12,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Wrapper;
 import java.util.List;
 
 /**
@@ -24,6 +25,8 @@ import java.util.List;
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
+    @Autowired
+    private DepartmentService departmentService;
 
     @Override
     public List<User> getAllStudent() {
@@ -44,6 +47,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public void editStudent(User user) {
+        fixUser(user);
         updateById(user);
+    }
+
+    private void fixUser(User user) {
+        user.setSid(user.getSid().replaceAll("\\s*", ""));
+        user.setCardId(user.getCardId().replaceAll("\\s*", ""));
+
+        QueryWrapper<Department> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("prefix", user.getSid().substring(0, 2));
+        Department department = departmentService.getOne(queryWrapper);
+        if (department != null)
+            user.setDepartment(department.getId());
+    }
+
+    @Override
+    public void insertStudent(User user) {
+        user.setRole(Constants.ROLE_STUDENT);
+        user.setStatus(Constants.STATUS_NOT_START);
+        fixUser(user);
+        save(user);
     }
 }
