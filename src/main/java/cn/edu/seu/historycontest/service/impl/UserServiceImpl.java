@@ -69,4 +69,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         fixUser(user);
         save(user);
     }
+
+    @Override
+    public User getStudentBySid(String sid) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("sid", sid.replaceAll("\\s*", ""));
+        return getOne(queryWrapper);
+    }
+
+    @Override
+    public User getStudentByCardId(String cardId) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("card_id", cardId.replaceAll("\\s*", ""));
+        return getOne(queryWrapper);
+    }
 }

@@ -19,4 +19,6 @@ public interface UserService extends IService<User> {
     Page<User> getStudentPage(long current, long size);
     void editStudent(User user);
     void insertStudent(User user);
+    User getStudentBySid(String sid);
+    User getStudentByCardId(String cardId);
 }
