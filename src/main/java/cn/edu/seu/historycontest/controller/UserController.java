@@ -59,6 +59,17 @@ public class UserController {
         return pageResponse;
     }
 
+    @PostMapping("student/query")
+    @PreAuthorize("hasRole('ADMIN')")
+    public GetPageResponse getStudentPageWithCondition(@RequestBody QueryPageRequest pageRequest) {
+        GetPageResponse pageResponse = new GetPageResponse();
+        Page<User> page = userService.getStudentPage(pageRequest.getPageIndex(), pageRequest.getPageSize(), pageRequest.getQueryType(), pageRequest.getQueryValue());
+        pageResponse.setTotal(page.getTotal());
+        pageResponse.setList(page.getRecords().stream().map(user ->
+                StudentListResponse.ofUser(user, paperService.getScore(user.getId()))).collect(Collectors.toList()));
+        return pageResponse;
+    }
+
     @GetMapping("student/list")
     @PreAuthorize("hasRole('ADMIN')")
     public List<StudentListResponse> getStudentList() {
@@ -96,6 +107,7 @@ public class UserController {
     }
 
     @PutMapping("password")
+    @PreAuthorize("hasRole('ADMIN')")
     public void changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest, @CurrentUser UserPrincipal userPrincipal) {
         userService.changePassword(userPrincipal, changePasswordRequest.getOldPassword(), changePasswordRequest.getNewPassword());
     }

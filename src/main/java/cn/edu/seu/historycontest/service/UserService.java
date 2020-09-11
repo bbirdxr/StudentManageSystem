@@ -18,6 +18,7 @@ import java.util.List;
 public interface UserService extends IService<User> {
     List<User> getAllStudent();
     Page<User> getStudentPage(long current, long size);
+    Page<User> getStudentPage(long current, long size, String queryType, String queryValue);
     void editStudent(User user);
     void insertStudent(User user);
     User getStudentBySid(String sid);

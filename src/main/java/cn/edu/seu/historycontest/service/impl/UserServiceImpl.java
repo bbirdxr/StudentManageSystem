@@ -12,8 +12,10 @@ import cn.edu.seu.historycontest.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.tomcat.util.bcel.Const;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -45,6 +47,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("role", Constants.ROLE_STUDENT);
 
+        page(page, queryWrapper);
+        return page;
+    }
+
+    @Override
+    public Page<User> getStudentPage(long current, long size, String queryType, String queryValue) {
+        Page<User> page = new Page<>(current, size);
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("role", Constants.ROLE_STUDENT);
+        if (!StringUtils.isEmpty(queryType) && !StringUtils.isEmpty(queryValue)) {
+            if ("status".equals(queryType)) {
+                if (Constants.STATUS_NOT_SUBMITTED.equals(queryValue))
+                    queryWrapper.ne(queryType, Constants.STATUS_SUBMITTED);
+                else
+                    queryWrapper.eq(queryType, Constants.STATUS_SUBMITTED);
+            }
+            else
+                queryWrapper.eq(queryType, queryValue);
+        }
         page(page, queryWrapper);
         return page;
     }
