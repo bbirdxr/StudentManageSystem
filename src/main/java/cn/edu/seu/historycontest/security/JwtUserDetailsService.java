@@ -23,14 +23,14 @@ public class JwtUserDetailsService implements UserDetailsService {
         queryWrapper.eq("sid", sid);
         User user = userMapper.selectOne(queryWrapper);
         if (user == null)
-            throw new UsernameNotFoundException("用户不存在！");
+            throw new UsernameNotFoundException("用户不存在");
         return UserPrincipal.ofUser(user);
     }
 
-    public UserDetails loadUserById(Long id) throws ResourceNotFoundException {
+    public UserDetails loadUserById(Long id) {
         User user = userMapper.selectById(id);
         if (user == null)
-            throw new ResourceNotFoundException("用户不存在！");
+            throw new UsernameNotFoundException("用户不存在");
         return UserPrincipal.ofUser(user);
     }
 

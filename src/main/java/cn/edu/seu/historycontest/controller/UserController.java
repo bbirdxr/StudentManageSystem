@@ -4,10 +4,7 @@ package cn.edu.seu.historycontest.controller;
 import cn.edu.seu.historycontest.Constants;
 import cn.edu.seu.historycontest.entity.ChoiceQuestion;
 import cn.edu.seu.historycontest.entity.User;
-import cn.edu.seu.historycontest.payload.EditStudentRequest;
-import cn.edu.seu.historycontest.payload.GetPageRequest;
-import cn.edu.seu.historycontest.payload.GetPageResponse;
-import cn.edu.seu.historycontest.payload.StudentListResponse;
+import cn.edu.seu.historycontest.payload.*;
 import cn.edu.seu.historycontest.security.CurrentUser;
 import cn.edu.seu.historycontest.security.UserPrincipal;
 import cn.edu.seu.historycontest.service.PaperService;
@@ -19,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -95,6 +93,11 @@ public class UserController {
         User user = new User();
         BeanUtils.copyProperties(student, user);
         userService.insertStudent(user);
+    }
+
+    @PutMapping("password")
+    public void changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest, @CurrentUser UserPrincipal userPrincipal) {
+        userService.changePassword(userPrincipal, changePasswordRequest.getOldPassword(), changePasswordRequest.getNewPassword());
     }
 
 }

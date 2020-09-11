@@ -1,9 +1,12 @@
 package cn.edu.seu.historycontest.service.impl;
 
 import cn.edu.seu.historycontest.Constants;
+import cn.edu.seu.historycontest.config.SecurityConfig;
 import cn.edu.seu.historycontest.entity.Department;
 import cn.edu.seu.historycontest.entity.User;
+import cn.edu.seu.historycontest.exception.ForbiddenException;
 import cn.edu.seu.historycontest.mapper.UserMapper;
+import cn.edu.seu.historycontest.security.UserPrincipal;
 import cn.edu.seu.historycontest.service.DepartmentService;
 import cn.edu.seu.historycontest.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -13,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -82,5 +86,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("card_id", cardId.replaceAll("\\s*", ""));
         return getOne(queryWrapper);
+    }
+
+    @Override
+    public void changePassword(UserPrincipal user, String oldPassword, String newPassword) {
+        if (!SecurityConfig.bCryptPasswordEncoder.matches(oldPassword, user.getPassword()))
+            throw new ForbiddenException("原密码错误");
+        User newUser = new User();
+        newUser.setId(user.getId());
+        newUser.setPassword(SecurityConfig.bCryptPasswordEncoder.encode(newPassword));
+        updateById(newUser);
     }
 }

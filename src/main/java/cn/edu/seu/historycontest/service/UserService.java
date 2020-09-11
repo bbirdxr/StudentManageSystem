@@ -1,6 +1,7 @@
 package cn.edu.seu.historycontest.service;
 
 import cn.edu.seu.historycontest.entity.User;
+import cn.edu.seu.historycontest.security.UserPrincipal;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -21,4 +22,5 @@ public interface UserService extends IService<User> {
     void insertStudent(User user);
     User getStudentBySid(String sid);
     User getStudentByCardId(String cardId);
+    void changePassword(UserPrincipal user, String oldPassword, String newPassword);
 }

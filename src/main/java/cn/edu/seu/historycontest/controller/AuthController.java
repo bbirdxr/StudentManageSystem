@@ -3,9 +3,13 @@ package cn.edu.seu.historycontest.controller;
 import cn.edu.seu.historycontest.Constants;
 import cn.edu.seu.historycontest.entity.User;
 import cn.edu.seu.historycontest.exception.ForbiddenException;
+import cn.edu.seu.historycontest.payload.ChangePasswordRequest;
 import cn.edu.seu.historycontest.payload.LoginRequest;
 import cn.edu.seu.historycontest.payload.LoginResponse;
+import cn.edu.seu.historycontest.security.CurrentUser;
 import cn.edu.seu.historycontest.security.JwtTokenProvider;
+import cn.edu.seu.historycontest.security.UserPrincipal;
+import cn.edu.seu.historycontest.service.AuthService;
 import cn.edu.seu.historycontest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,37 +26,15 @@ import java.util.Map;
 public class AuthController {
 
     @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private JwtTokenProvider tokenProvider;
-
-    @Autowired
-    private UserService userService;
+    private AuthService authService;
 
     @PostMapping("login")
     public LoginResponse login(@Valid @RequestBody LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getSid(),
-                        loginRequest.getPassword()
-                )
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = tokenProvider.generateToken(authentication);
-        return new LoginResponse(jwt);
+        return new LoginResponse(authService.login(loginRequest.getSid(), loginRequest.getPassword(), loginRequest.getCode()));
     }
 
     @PostMapping("register")
     public void register(@RequestBody RegisterRequest registerRequest) {
-        if (null != userService.getStudentBySid(registerRequest.getSid()))
-            throw new ForbiddenException("学号已存在");
-        if (null != userService.getStudentByCardId(registerRequest.getCardId()))
-            throw new ForbiddenException("一卡通号已存在");
-        User user = new User();
-        user.setSid(registerRequest.getSid());
-        user.setCardId(registerRequest.getCardId());
-        user.setName(registerRequest.getName());
-        userService.insertStudent(user);
+        authService.register(registerRequest.getSid(), registerRequest.getCardId(), registerRequest.getName());
     }
 }

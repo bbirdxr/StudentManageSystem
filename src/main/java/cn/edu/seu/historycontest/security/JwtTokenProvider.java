@@ -3,7 +3,9 @@ package cn.edu.seu.historycontest.security;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
 import java.security.SignatureException;
@@ -46,11 +48,10 @@ public class JwtTokenProvider {
     public boolean validateToken(String authToken) {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
-            return true;
-        } catch (JwtException ex) {
-            log.warn("JWT验证失败");
+        } catch (ExpiredJwtException e) {
+            throw new CredentialsExpiredException("Time Limit Exceeds");
         }
-        return false;
+        return true;
     }
 
 }
