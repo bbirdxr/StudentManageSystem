@@ -39,10 +39,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void register(String sid, String cardId, String name) {
-        if (null != userService.getStudentBySid(sid))
-            throw new ForbiddenException("学号已存在");
-        if (null != userService.getStudentByCardId(cardId))
-            throw new ForbiddenException("一卡通号已存在");
         User user = new User();
         user.setSid(sid);
         user.setCardId(cardId);

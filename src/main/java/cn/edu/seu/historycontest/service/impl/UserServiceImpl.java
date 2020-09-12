@@ -5,6 +5,7 @@ import cn.edu.seu.historycontest.config.SecurityConfig;
 import cn.edu.seu.historycontest.entity.Department;
 import cn.edu.seu.historycontest.entity.User;
 import cn.edu.seu.historycontest.exception.ForbiddenException;
+import cn.edu.seu.historycontest.exception.StudentAlreadyExistsException;
 import cn.edu.seu.historycontest.mapper.UserMapper;
 import cn.edu.seu.historycontest.payload.GetPageResponse;
 import cn.edu.seu.historycontest.payload.StudentListResponse;
@@ -15,13 +16,11 @@ import cn.edu.seu.historycontest.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.apache.tomcat.util.bcel.Const;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -94,11 +93,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public void editStudent(User user) {
-        fixUser(user);
+        if (null != getStudentBySid(user.getSid()))
+            throw new ForbiddenException("学号已存在");
+        if (null != getStudentByCardId(user.getCardId()))
+            throw new ForbiddenException("一卡通号已存在");
+
+        fixStudent(user);
         updateById(user);
     }
 
-    private void fixUser(User user) {
+    private void fixStudent(User user) {
         user.setSid(user.getSid().replaceAll("\\s*", ""));
         user.setCardId(user.getCardId().replaceAll("\\s*", ""));
 
@@ -111,10 +115,37 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public void insertStudent(User user) {
+        if (null != getStudentBySid(user.getSid()))
+            throw StudentAlreadyExistsException.bySid(user.getSid());
+        if (null != getStudentByCardId(user.getCardId()))
+            throw StudentAlreadyExistsException.byCardId(user.getCardId());
+
         user.setRole(Constants.ROLE_STUDENT);
         user.setStatus(Constants.STATUS_NOT_START);
-        fixUser(user);
+        fixStudent(user);
         save(user);
+    }
+
+    @Override
+    public void insertStudents(List<User> users) {
+        for (User user : users) {
+            if (null != getStudentBySid(user.getSid()))
+                throw StudentAlreadyExistsException.bySid(user.getSid());
+            if (null != getStudentByCardId(user.getCardId()))
+                throw StudentAlreadyExistsException.byCardId(user.getCardId());
+
+            user.setRole(Constants.ROLE_STUDENT);
+            user.setStatus(Constants.STATUS_NOT_START);
+            fixStudent(user);
+        }
+        saveBatch(users);
+    }
+
+    @Override
+    public void deleteAllStudents() {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("role", Constants.ROLE_STUDENT);
+        remove(queryWrapper);
     }
 
     @Override
@@ -140,4 +171,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         newUser.setPassword(SecurityConfig.bCryptPasswordEncoder.encode(newPassword));
         updateById(newUser);
     }
+
+
 }

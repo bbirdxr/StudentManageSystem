@@ -17,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -114,6 +115,18 @@ public class UserController {
         response.setCharacterEncoding("utf-8");
         response.setHeader("Content-disposition", "attachment;filename=data.xlsx");
         excelService.exportStudentList(response.getOutputStream());
+    }
+
+    @PostMapping("student/import/insert")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void importStudentAndInsert(@RequestParam(value = "file") MultipartFile upload) throws IOException {
+        excelService.importStudent(upload.getInputStream(), false);
+    }
+
+    @PostMapping("student/import/cover")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void importStudentAndCover(@RequestParam(value = "file") MultipartFile upload) throws IOException {
+        excelService.importStudent(upload.getInputStream(), true);
     }
 }
 

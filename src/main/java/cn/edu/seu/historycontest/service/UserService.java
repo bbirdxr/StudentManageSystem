@@ -7,6 +7,7 @@ import cn.edu.seu.historycontest.security.UserPrincipal;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -18,13 +19,17 @@ import java.util.List;
  * @since 2020-08-28
  */
 public interface UserService extends IService<User> {
+    void insertStudent(User user);
+    void insertStudents(List<User> users);
+    void deleteAllStudents();
+    void editStudent(User user);
+    void changePassword(UserPrincipal user, String oldPassword, String newPassword);
+
     List<User> getAllStudent();
     List<StudentListResponse> getStudentList();
     GetPageResponse getStudentPage(long current, long size);
     GetPageResponse getStudentPage(long current, long size, String queryType, String queryValue);
-    void editStudent(User user);
-    void insertStudent(User user);
     User getStudentBySid(String sid);
     User getStudentByCardId(String cardId);
-    void changePassword(UserPrincipal user, String oldPassword, String newPassword);
+
 }

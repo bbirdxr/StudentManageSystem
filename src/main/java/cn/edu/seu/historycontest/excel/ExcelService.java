@@ -1,11 +1,11 @@
 package cn.edu.seu.historycontest.excel;
 
 import cn.edu.seu.historycontest.Constants;
-import cn.edu.seu.historycontest.entity.Department;
-import cn.edu.seu.historycontest.excel.entity.StudentExcelEntity;
+import cn.edu.seu.historycontest.excel.entity.ExportStudentEntity;
+import cn.edu.seu.historycontest.excel.entity.ImportStudentEntity;
+import cn.edu.seu.historycontest.excel.listener.ImportStudentListener;
 import cn.edu.seu.historycontest.payload.StudentListResponse;
 import cn.edu.seu.historycontest.service.DepartmentService;
-import cn.edu.seu.historycontest.service.PaperService;
 import cn.edu.seu.historycontest.service.UserService;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
@@ -15,9 +15,9 @@ import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,7 +30,7 @@ public class ExcelService {
     private DepartmentService departmentService;
 
     public void exportStudentList(OutputStream outputStream) {
-        List<StudentExcelEntity> list = prepareStudentList();
+        List<ExportStudentEntity> list = prepareStudentList();
 
         WriteCellStyle style = new WriteCellStyle();
         WriteFont font = new WriteFont();
@@ -43,7 +43,7 @@ public class ExcelService {
         ExcelWriter excelWriter = null;
         try {
             excelWriter = EasyExcel.write(outputStream).build();
-            excelWriter.write(list, EasyExcel.writerSheet("学生列表").head(StudentExcelEntity.class).registerWriteHandler(horizontalCellStyleStrategy).build());
+            excelWriter.write(list, EasyExcel.writerSheet("学生列表").head(ExportStudentEntity.class).registerWriteHandler(horizontalCellStyleStrategy).build());
         } finally {
             if (excelWriter != null)
                 excelWriter.finish();
@@ -51,10 +51,10 @@ public class ExcelService {
 
     }
 
-    private List<StudentExcelEntity> prepareStudentList() {
+    private List<ExportStudentEntity> prepareStudentList() {
         List<StudentListResponse> studentList = userService.getStudentList();
         return studentList.stream().map(response -> {
-            StudentExcelEntity studentExcelEntity = new StudentExcelEntity();
+            ExportStudentEntity studentExcelEntity = new ExportStudentEntity();
             studentExcelEntity.setSid(response.getSid());
             studentExcelEntity.setCardId(response.getCardId());
             studentExcelEntity.setName(response.getName());
@@ -66,6 +66,12 @@ public class ExcelService {
             studentExcelEntity.setScore(response.getScore());
             return studentExcelEntity;
         }).collect(Collectors.toList());
+    }
+
+    public void importStudent(InputStream inputStream, boolean cover) {
+        if (cover)
+            userService.deleteAllStudents();
+        EasyExcel.read(inputStream, ImportStudentEntity.class, new ImportStudentListener(userService)).sheet().doRead();
     }
 
 }

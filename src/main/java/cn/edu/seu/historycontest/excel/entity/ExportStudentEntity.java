@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-public class StudentExcelEntity {
+public class ExportStudentEntity {
 
     @ExcelProperty("学号")
     private String sid;
