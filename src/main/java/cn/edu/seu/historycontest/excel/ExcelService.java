@@ -1,11 +1,17 @@
 package cn.edu.seu.historycontest.excel;
 
 import cn.edu.seu.historycontest.Constants;
-import cn.edu.seu.historycontest.excel.entity.ExportStudentEntity;
-import cn.edu.seu.historycontest.excel.entity.ImportStudentEntity;
+import cn.edu.seu.historycontest.excel.entity.ChoiceQuestionImportEntity;
+import cn.edu.seu.historycontest.excel.entity.JudgeQuestionImportEntity;
+import cn.edu.seu.historycontest.excel.entity.StudentExportEntity;
+import cn.edu.seu.historycontest.excel.entity.StudentImportEntity;
+import cn.edu.seu.historycontest.excel.listener.ImportChoiceQuestionListener;
+import cn.edu.seu.historycontest.excel.listener.ImportJudgeQuestionListener;
 import cn.edu.seu.historycontest.excel.listener.ImportStudentListener;
 import cn.edu.seu.historycontest.payload.StudentListResponse;
+import cn.edu.seu.historycontest.service.ChoiceQuestionService;
 import cn.edu.seu.historycontest.service.DepartmentService;
+import cn.edu.seu.historycontest.service.JudgeQuestionService;
 import cn.edu.seu.historycontest.service.UserService;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
@@ -27,10 +33,16 @@ public class ExcelService {
     private UserService userService;
 
     @Autowired
+    private ChoiceQuestionService choiceQuestionService;
+
+    @Autowired
+    private JudgeQuestionService judgeQuestionService;
+
+    @Autowired
     private DepartmentService departmentService;
 
     public void exportStudentList(OutputStream outputStream) {
-        List<ExportStudentEntity> list = prepareStudentList();
+        List<StudentExportEntity> list = prepareStudentList();
 
         WriteCellStyle style = new WriteCellStyle();
         WriteFont font = new WriteFont();
@@ -43,7 +55,7 @@ public class ExcelService {
         ExcelWriter excelWriter = null;
         try {
             excelWriter = EasyExcel.write(outputStream).build();
-            excelWriter.write(list, EasyExcel.writerSheet("学生列表").head(ExportStudentEntity.class).registerWriteHandler(horizontalCellStyleStrategy).build());
+            excelWriter.write(list, EasyExcel.writerSheet("学生列表").head(StudentExportEntity.class).registerWriteHandler(horizontalCellStyleStrategy).build());
         } finally {
             if (excelWriter != null)
                 excelWriter.finish();
@@ -51,10 +63,10 @@ public class ExcelService {
 
     }
 
-    private List<ExportStudentEntity> prepareStudentList() {
+    private List<StudentExportEntity> prepareStudentList() {
         List<StudentListResponse> studentList = userService.getStudentList();
         return studentList.stream().map(response -> {
-            ExportStudentEntity studentExcelEntity = new ExportStudentEntity();
+            StudentExportEntity studentExcelEntity = new StudentExportEntity();
             studentExcelEntity.setSid(response.getSid());
             studentExcelEntity.setCardId(response.getCardId());
             studentExcelEntity.setName(response.getName());
@@ -71,7 +83,18 @@ public class ExcelService {
     public void importStudent(InputStream inputStream, boolean cover) {
         if (cover)
             userService.deleteAllStudents();
-        EasyExcel.read(inputStream, ImportStudentEntity.class, new ImportStudentListener(userService)).sheet().doRead();
+        EasyExcel.read(inputStream, StudentImportEntity.class, new ImportStudentListener(userService)).sheet().doRead();
     }
 
+    public void importChoiceQuestion(InputStream inputStream, boolean cover) {
+        if (cover)
+            choiceQuestionService.remove(null);
+        EasyExcel.read(inputStream, ChoiceQuestionImportEntity.class, new ImportChoiceQuestionListener(choiceQuestionService)).sheet().doRead();
+    }
+
+    public void importJudgeQuestion(InputStream inputStream, boolean cover) {
+        if (cover)
+            judgeQuestionService.remove(null);
+        EasyExcel.read(inputStream, JudgeQuestionImportEntity.class, new ImportJudgeQuestionListener(judgeQuestionService)).sheet().doRead();
+    }
 }

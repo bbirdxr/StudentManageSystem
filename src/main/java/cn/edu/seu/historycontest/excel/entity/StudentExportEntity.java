@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-public class ExportStudentEntity {
+public class StudentExportEntity {
 
     @ExcelProperty("学号")
     private String sid;
@@ -22,17 +22,5 @@ public class ExportStudentEntity {
     private String department;
     @ExcelProperty("分数")
     private Integer score;
-
-//    public static StudentExcelEntity ofStudentListResponse(StudentListResponse response) {
-//        StudentExcelEntity entity = new StudentExcelEntity();
-//        entity.setSid(response.getSid());
-//        entity.setCardId(response.getCardId());
-//        entity.setName(response.getName());
-//        if (Constants.STATUS_SUBMITTED.equals(response.getStatus()))
-//            entity.setStatus("已提交");
-//        else
-//            entity.setStatus("未提交");
-//
-//    }
 
 }

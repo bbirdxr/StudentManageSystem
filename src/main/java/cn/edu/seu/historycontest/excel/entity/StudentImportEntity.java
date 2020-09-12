@@ -4,7 +4,7 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
 @Data
-public class ImportStudentEntity {
+public class StudentImportEntity {
 
     @ExcelProperty("学号")
     private String sid;

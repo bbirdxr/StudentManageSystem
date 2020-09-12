@@ -1,8 +1,7 @@
 package cn.edu.seu.historycontest.config;
 
 import cn.edu.seu.historycontest.exception.ForbiddenException;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
+import com.alibaba.excel.exception.ExcelDataConvertException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,5 +21,11 @@ public class GlobalExceptionConfig {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public String handleAuthenticationException(AuthenticationException e) {
         return e.getMessage();
+    }
+
+    @ExceptionHandler(ExcelDataConvertException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleExcelDataConvertException(ExcelDataConvertException e) {
+        return "数据格式错误，请重试";
     }
 }

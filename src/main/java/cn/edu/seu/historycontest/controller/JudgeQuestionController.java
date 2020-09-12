@@ -3,6 +3,7 @@ package cn.edu.seu.historycontest.controller;
 
 import cn.edu.seu.historycontest.entity.ChoiceQuestion;
 import cn.edu.seu.historycontest.entity.JudgeQuestion;
+import cn.edu.seu.historycontest.excel.ExcelService;
 import cn.edu.seu.historycontest.payload.GetPageRequest;
 import cn.edu.seu.historycontest.payload.GetPageResponse;
 import cn.edu.seu.historycontest.service.ChoiceQuestionService;
@@ -11,7 +12,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -28,6 +31,9 @@ public class JudgeQuestionController {
 
     @Autowired
     private JudgeQuestionService judgeQuestionService;
+
+    @Autowired
+    private ExcelService excelService;
 
     @GetMapping("list")
     @PreAuthorize("hasRole('ADMIN')")
@@ -70,6 +76,16 @@ public class JudgeQuestionController {
         judgeQuestionService.removeByIds(ids);
     }
 
+    @PostMapping("import/insert")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void importAndInsert(@RequestParam(value = "file") MultipartFile upload) throws IOException {
+        excelService.importJudgeQuestion(upload.getInputStream(), false);
+    }
 
+    @PostMapping("import/cover")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void importAndCover(@RequestParam(value = "file") MultipartFile upload) throws IOException {
+        excelService.importJudgeQuestion(upload.getInputStream(), true);
+    }
 }
 

@@ -119,13 +119,13 @@ public class UserController {
 
     @PostMapping("student/import/insert")
     @PreAuthorize("hasRole('ADMIN')")
-    public void importStudentAndInsert(@RequestParam(value = "file") MultipartFile upload) throws IOException {
+    public void importAndInsert(@RequestParam(value = "file") MultipartFile upload) throws IOException {
         excelService.importStudent(upload.getInputStream(), false);
     }
 
     @PostMapping("student/import/cover")
     @PreAuthorize("hasRole('ADMIN')")
-    public void importStudentAndCover(@RequestParam(value = "file") MultipartFile upload) throws IOException {
+    public void importAndCover(@RequestParam(value = "file") MultipartFile upload) throws IOException {
         excelService.importStudent(upload.getInputStream(), true);
     }
 }

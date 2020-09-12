@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2020-08-28
  */
 public interface ChoiceQuestionService extends IService<ChoiceQuestion> {
-
+    void removeAll();
 }
