@@ -12,4 +12,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2020-09-09
  */
 public interface DepartmentService extends IService<Department> {
+
+    String getNameById(Integer id);
+
 }

@@ -171,7 +171,7 @@ public class PaperServiceImpl extends ServiceImpl<PaperMapper, Paper> implements
     public Integer getScore(Long uid) {
         Paper paper = getPaperFromUid(uid);
         if (paper == null)
-            return -1;
+            return 0;
         return paper.getScore();
     }
 

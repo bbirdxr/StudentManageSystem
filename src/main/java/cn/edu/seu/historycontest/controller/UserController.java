@@ -4,6 +4,7 @@ package cn.edu.seu.historycontest.controller;
 import cn.edu.seu.historycontest.Constants;
 import cn.edu.seu.historycontest.entity.ChoiceQuestion;
 import cn.edu.seu.historycontest.entity.User;
+import cn.edu.seu.historycontest.excel.ExcelService;
 import cn.edu.seu.historycontest.payload.*;
 import cn.edu.seu.historycontest.security.CurrentUser;
 import cn.edu.seu.historycontest.security.UserPrincipal;
@@ -14,9 +15,12 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -40,6 +44,9 @@ public class UserController {
     @Autowired
     private PaperService paperService;
 
+    @Autowired
+    private ExcelService excelService;
+
     @GetMapping
     public User getInfo(@CurrentUser UserPrincipal userPrincipal) {
         User user = new User();
@@ -51,31 +58,19 @@ public class UserController {
     @PostMapping("student/page")
     @PreAuthorize("hasRole('ADMIN')")
     public GetPageResponse getStudentPage(@RequestBody GetPageRequest pageRequest) {
-        GetPageResponse pageResponse = new GetPageResponse();
-        Page<User> page = userService.getStudentPage(pageRequest.getPageIndex(), pageRequest.getPageSize());
-        pageResponse.setTotal(page.getTotal());
-        pageResponse.setList(page.getRecords().stream().map(user ->
-                StudentListResponse.ofUser(user, paperService.getScore(user.getId()))).collect(Collectors.toList()));
-        return pageResponse;
+        return userService.getStudentPage(pageRequest.getPageIndex(), pageRequest.getPageSize());
     }
 
     @PostMapping("student/query")
     @PreAuthorize("hasRole('ADMIN')")
     public GetPageResponse getStudentPageWithCondition(@RequestBody QueryPageRequest pageRequest) {
-        GetPageResponse pageResponse = new GetPageResponse();
-        Page<User> page = userService.getStudentPage(pageRequest.getPageIndex(), pageRequest.getPageSize(), pageRequest.getQueryType(), pageRequest.getQueryValue());
-        pageResponse.setTotal(page.getTotal());
-        pageResponse.setList(page.getRecords().stream().map(user ->
-                StudentListResponse.ofUser(user, paperService.getScore(user.getId()))).collect(Collectors.toList()));
-        return pageResponse;
+        return userService.getStudentPage(pageRequest.getPageIndex(), pageRequest.getPageSize(), pageRequest.getQueryType(), pageRequest.getQueryValue());
     }
 
     @GetMapping("student/list")
     @PreAuthorize("hasRole('ADMIN')")
     public List<StudentListResponse> getStudentList() {
-        List<User> student = userService.getAllStudent();
-        return student.stream().map(user ->
-                StudentListResponse.ofUser(user, paperService.getScore(user.getId()))).collect(Collectors.toList());
+        return userService.getStudentList();
     }
 
     @PutMapping("student/edit")
@@ -112,5 +107,13 @@ public class UserController {
         userService.changePassword(userPrincipal, changePasswordRequest.getOldPassword(), changePasswordRequest.getNewPassword());
     }
 
+    @GetMapping("student/export")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void exportStudentList(HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.ms-excel");
+        response.setCharacterEncoding("utf-8");
+        response.setHeader("Content-disposition", "attachment;filename=data.xlsx");
+        excelService.exportStudentList(response.getOutputStream());
+    }
 }
 

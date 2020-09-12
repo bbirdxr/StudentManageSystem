@@ -13,6 +13,7 @@ public class StudentListResponse extends User{
     public static StudentListResponse ofUser(User user, Integer score) {
         StudentListResponse response = new StudentListResponse();
         BeanUtils.copyProperties(user, response);
+        response.setPassword(null);
         response.setScore(score);
         return response;
     }

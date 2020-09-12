@@ -1,6 +1,8 @@
 package cn.edu.seu.historycontest.service;
 
 import cn.edu.seu.historycontest.entity.User;
+import cn.edu.seu.historycontest.payload.GetPageResponse;
+import cn.edu.seu.historycontest.payload.StudentListResponse;
 import cn.edu.seu.historycontest.security.UserPrincipal;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -17,8 +19,9 @@ import java.util.List;
  */
 public interface UserService extends IService<User> {
     List<User> getAllStudent();
-    Page<User> getStudentPage(long current, long size);
-    Page<User> getStudentPage(long current, long size, String queryType, String queryValue);
+    List<StudentListResponse> getStudentList();
+    GetPageResponse getStudentPage(long current, long size);
+    GetPageResponse getStudentPage(long current, long size, String queryType, String queryValue);
     void editStudent(User user);
     void insertStudent(User user);
     User getStudentBySid(String sid);

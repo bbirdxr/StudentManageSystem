@@ -6,8 +6,11 @@ import cn.edu.seu.historycontest.entity.Department;
 import cn.edu.seu.historycontest.entity.User;
 import cn.edu.seu.historycontest.exception.ForbiddenException;
 import cn.edu.seu.historycontest.mapper.UserMapper;
+import cn.edu.seu.historycontest.payload.GetPageResponse;
+import cn.edu.seu.historycontest.payload.StudentListResponse;
 import cn.edu.seu.historycontest.security.UserPrincipal;
 import cn.edu.seu.historycontest.service.DepartmentService;
+import cn.edu.seu.historycontest.service.PaperService;
 import cn.edu.seu.historycontest.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -19,6 +22,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -34,6 +38,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Autowired
     private DepartmentService departmentService;
 
+    @Autowired
+    private PaperService paperService;
+
     @Override
     public List<User> getAllStudent() {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -42,17 +49,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public Page<User> getStudentPage(long current, long size) {
+    public List<StudentListResponse> getStudentList() {
+        List<User> student = getAllStudent();
+        return student.stream().map(user ->
+                StudentListResponse.ofUser(user, paperService.getScore(user.getId()))).collect(Collectors.toList());
+    }
+
+    @Override
+    public GetPageResponse getStudentPage(long current, long size) {
         Page<User> page = new Page<>(current, size);
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("role", Constants.ROLE_STUDENT);
 
-        page(page, queryWrapper);
-        return page;
+        return queryPage(page, queryWrapper);
     }
 
     @Override
-    public Page<User> getStudentPage(long current, long size, String queryType, String queryValue) {
+    public GetPageResponse getStudentPage(long current, long size, String queryType, String queryValue) {
         Page<User> page = new Page<>(current, size);
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("role", Constants.ROLE_STUDENT);
@@ -66,8 +79,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             else
                 queryWrapper.eq(queryType, queryValue);
         }
+        return queryPage(page, queryWrapper);
+    }
+
+    private GetPageResponse queryPage(Page<User> page, QueryWrapper<User> queryWrapper) {
         page(page, queryWrapper);
-        return page;
+
+        GetPageResponse pageResponse = new GetPageResponse();
+        pageResponse.setTotal(page.getTotal());
+        pageResponse.setList(page.getRecords().stream().map(user ->
+                StudentListResponse.ofUser(user, paperService.getScore(user.getId()))).collect(Collectors.toList()));
+        return pageResponse;
     }
 
     @Override
