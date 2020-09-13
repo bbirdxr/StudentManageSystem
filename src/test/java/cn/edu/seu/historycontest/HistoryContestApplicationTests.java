@@ -1,18 +1,10 @@
 package cn.edu.seu.historycontest;
 
-import cn.edu.seu.historycontest.controller.ChoiceQuestionController;
-import cn.edu.seu.historycontest.entity.ChoiceQuestion;
 import cn.edu.seu.historycontest.entity.Department;
-import cn.edu.seu.historycontest.entity.JudgeQuestion;
-import cn.edu.seu.historycontest.mapper.ChoiceQuestionMapper;
-import cn.edu.seu.historycontest.mapper.JudgeQuestionMapper;
 import cn.edu.seu.historycontest.service.DepartmentService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Random;
 
 @SpringBootTest
 class HistoryContestApplicationTests {
@@ -21,6 +13,7 @@ class HistoryContestApplicationTests {
     private DepartmentService departmentService;
 
 
+    @Test
     void insertDepartment() {
         departmentService.save(new Department("01", "建筑学类"));
         departmentService.save(new Department("G1", "机械能源材料类"));

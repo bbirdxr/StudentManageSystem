@@ -24,5 +24,12 @@ import java.util.List;
 @RequestMapping("/api/department")
 public class DepartmentController {
 
+    @Autowired
+    private DepartmentService departmentService;
+
+    @GetMapping
+    public List<Department> get() {
+        return departmentService.list();
+    }
 }
 
