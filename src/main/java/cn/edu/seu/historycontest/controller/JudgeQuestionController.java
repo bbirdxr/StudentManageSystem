@@ -88,5 +88,11 @@ public class JudgeQuestionController {
     public void importAndCover(@RequestParam(value = "file") MultipartFile upload) throws IOException {
         excelService.importJudgeQuestion(upload.getInputStream(), true);
     }
+
+    @GetMapping("count")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Integer getCount() {
+        return judgeQuestionService.list().size();
+    }
 }
 

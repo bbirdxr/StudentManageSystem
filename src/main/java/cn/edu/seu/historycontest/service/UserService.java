@@ -32,4 +32,5 @@ public interface UserService extends IService<User> {
     User getStudentBySid(String sid);
     User getStudentByCardId(String cardId);
 
+    Integer getStudentCount();
 }

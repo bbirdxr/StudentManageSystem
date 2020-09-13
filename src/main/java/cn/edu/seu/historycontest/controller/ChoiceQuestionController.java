@@ -86,5 +86,11 @@ public class ChoiceQuestionController {
     public void importAndCover(@RequestParam(value = "file") MultipartFile upload) throws IOException {
         excelService.importChoiceQuestion(upload.getInputStream(), true);
     }
+
+    @GetMapping("count")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Integer getCount() {
+        return choiceQuestionService.list().size();
+    }
 }
 

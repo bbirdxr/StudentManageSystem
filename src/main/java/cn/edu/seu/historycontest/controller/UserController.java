@@ -43,9 +43,6 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private PaperService paperService;
-
-    @Autowired
     private ExcelService excelService;
 
     @GetMapping
@@ -54,6 +51,12 @@ public class UserController {
         BeanUtils.copyProperties(userPrincipal, user);
         user.setPassword(null);
         return user;
+    }
+
+    @GetMapping("student/count")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Integer getStudentCount() {
+        return userService.getStudentCount();
     }
 
     @PostMapping("student/page")

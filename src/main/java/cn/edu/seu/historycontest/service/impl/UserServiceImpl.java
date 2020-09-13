@@ -163,6 +163,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    public Integer getStudentCount() {
+        return getAllStudent().size();
+    }
+
+    @Override
     public void changePassword(UserPrincipal user, String oldPassword, String newPassword) {
         if (!SecurityConfig.bCryptPasswordEncoder.matches(oldPassword, user.getPassword()))
             throw new ForbiddenException("原密码错误");
