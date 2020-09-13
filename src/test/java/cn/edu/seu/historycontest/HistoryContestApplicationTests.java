@@ -13,7 +13,6 @@ class HistoryContestApplicationTests {
     private DepartmentService departmentService;
 
 
-    @Test
     void insertDepartment() {
         departmentService.save(new Department("01", "建筑学类"));
         departmentService.save(new Department("G1", "机械能源材料类"));
