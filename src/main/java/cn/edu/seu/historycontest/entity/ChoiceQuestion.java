@@ -9,6 +9,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 /**
  * <p>
  * 
@@ -27,6 +30,8 @@ public class ChoiceQuestion implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
+    @NotNull(message = "问题不能为空")
+    @NotBlank(message = "问题不能为空")
     private String question;
 
     private String choiceA;
@@ -40,6 +45,7 @@ public class ChoiceQuestion implements Serializable {
     /**
      * 从0开始
      */
+    @NotNull(message = "答案不能为空")
     private Integer answer;
 
     @JsonIgnore

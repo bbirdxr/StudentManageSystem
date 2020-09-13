@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class ChoiceQuestionController {
 
     @PostMapping("page")
     @PreAuthorize("hasRole('ADMIN')")
-    public GetPageResponse getPage(@RequestBody GetPageRequest pageRequest) {
+    public GetPageResponse getPage(@Valid @RequestBody GetPageRequest pageRequest) {
         GetPageResponse pageResponse = new GetPageResponse();
         Page<ChoiceQuestion> page = new Page<>(pageRequest.getPageIndex(), pageRequest.getPageSize());
         choiceQuestionService.page(page);
@@ -52,13 +53,13 @@ public class ChoiceQuestionController {
 
     @PutMapping("insert")
     @PreAuthorize("hasRole('ADMIN')")
-    public void insert(@RequestBody ChoiceQuestion choiceQuestion) {
+    public void insert(@Valid @RequestBody ChoiceQuestion choiceQuestion) {
         choiceQuestionService.save(choiceQuestion);
     }
 
     @PutMapping("edit")
     @PreAuthorize("hasRole('ADMIN')")
-    public void edit(@RequestBody ChoiceQuestion choiceQuestion) {
+    public void edit(@Valid @RequestBody ChoiceQuestion choiceQuestion) {
         choiceQuestionService.updateById(choiceQuestion);
     }
 

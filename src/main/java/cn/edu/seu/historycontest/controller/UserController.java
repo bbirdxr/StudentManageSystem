@@ -58,13 +58,13 @@ public class UserController {
 
     @PostMapping("student/page")
     @PreAuthorize("hasRole('ADMIN')")
-    public GetPageResponse getStudentPage(@RequestBody GetPageRequest pageRequest) {
+    public GetPageResponse getStudentPage(@Valid @RequestBody GetPageRequest pageRequest) {
         return userService.getStudentPage(pageRequest.getPageIndex(), pageRequest.getPageSize());
     }
 
     @PostMapping("student/query")
     @PreAuthorize("hasRole('ADMIN')")
-    public GetPageResponse getStudentPageWithCondition(@RequestBody QueryPageRequest pageRequest) {
+    public GetPageResponse getStudentPageWithCondition(@Valid @RequestBody QueryPageRequest pageRequest) {
         return userService.getStudentPage(pageRequest.getPageIndex(), pageRequest.getPageSize(), pageRequest.getQueryType(), pageRequest.getQueryValue());
     }
 
@@ -76,7 +76,7 @@ public class UserController {
 
     @PutMapping("student/edit")
     @PreAuthorize("hasRole('ADMIN')")
-    public void editStudent(@RequestBody EditStudentRequest student) {
+    public void editStudent(@Valid @RequestBody EditStudentRequest student) {
         User user = new User();
         BeanUtils.copyProperties(student, user);
         userService.editStudent(user);
@@ -96,7 +96,7 @@ public class UserController {
 
     @PutMapping("student/insert")
     @PreAuthorize("hasRole('ADMIN')")
-    public void insertStudent(@RequestBody EditStudentRequest student) {
+    public void insertStudent(@Valid @RequestBody EditStudentRequest student) {
         User user = new User();
         BeanUtils.copyProperties(student, user);
         userService.insertStudent(user);

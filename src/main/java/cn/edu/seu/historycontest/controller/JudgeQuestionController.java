@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class JudgeQuestionController {
 
     @PostMapping("page")
     @PreAuthorize("hasRole('ADMIN')")
-    public GetPageResponse getPage(@RequestBody GetPageRequest pageRequest) {
+    public GetPageResponse getPage(@Valid  @RequestBody GetPageRequest pageRequest) {
         GetPageResponse pageResponse = new GetPageResponse();
         Page<JudgeQuestion> page = new Page<>(pageRequest.getPageIndex(), pageRequest.getPageSize());
         judgeQuestionService.page(page);
@@ -54,13 +55,13 @@ public class JudgeQuestionController {
 
     @PutMapping("insert")
     @PreAuthorize("hasRole('ADMIN')")
-    public void insert(@RequestBody JudgeQuestion judgeQuestion) {
+    public void insert(@Valid @RequestBody JudgeQuestion judgeQuestion) {
         judgeQuestionService.save(judgeQuestion);
     }
 
     @PutMapping("edit")
     @PreAuthorize("hasRole('ADMIN')")
-    public void edit(@RequestBody JudgeQuestion judgeQuestion) {
+    public void edit(@Valid @RequestBody JudgeQuestion judgeQuestion) {
         judgeQuestionService.updateById(judgeQuestion);
     }
 
