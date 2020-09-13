@@ -1,4 +1,4 @@
-package cn.edu.seu.historycontest.generator;
+package cn.edu.seu.historycontest;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.annotation.IdType;

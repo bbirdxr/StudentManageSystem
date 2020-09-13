@@ -1,7 +1,10 @@
 package cn.edu.seu.historycontest.mapper;
 
+import cn.edu.seu.historycontest.config.CacheConfig;
 import cn.edu.seu.historycontest.entity.Department;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.CacheNamespace;
+import org.springframework.stereotype.Repository;
 
 /**
  * <p>
@@ -11,6 +14,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author ${author}
  * @since 2020-09-09
  */
+@Repository
+@CacheNamespace(implementation = CacheConfig.class, eviction = CacheConfig.class)
 public interface DepartmentMapper extends BaseMapper<Department> {
 
 }

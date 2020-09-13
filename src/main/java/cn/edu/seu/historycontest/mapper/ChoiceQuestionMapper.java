@@ -1,7 +1,9 @@
 package cn.edu.seu.historycontest.mapper;
 
+import cn.edu.seu.historycontest.config.CacheConfig;
 import cn.edu.seu.historycontest.entity.ChoiceQuestion;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.CacheNamespace;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Repository;
  * @since 2020-08-28
  */
 @Repository
+@CacheNamespace(implementation = CacheConfig.class, eviction = CacheConfig.class)
 public interface ChoiceQuestionMapper extends BaseMapper<ChoiceQuestion> {
 
 }
