@@ -8,6 +8,7 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -21,6 +22,7 @@ import javax.validation.constraints.NotNull;
  * @since 2020-08-28
  */
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @TableName("hc_judge_question")
 public class JudgeQuestion implements Serializable {

@@ -8,6 +8,7 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>
@@ -18,6 +19,7 @@ import lombok.EqualsAndHashCode;
  * @since 2020-08-28
  */
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @TableName("hc_paper")
 public class Paper implements Serializable {
