@@ -20,6 +20,10 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
     @Override
     public String getNameById(Integer id) {
-        return getById(id).getName();
+        Department department = getById(id);
+        if (department != null)
+            return department.getName();
+        else
+            return "无法识别";
     }
 }

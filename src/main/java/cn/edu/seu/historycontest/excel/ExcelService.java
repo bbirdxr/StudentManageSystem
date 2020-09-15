@@ -1,13 +1,14 @@
 package cn.edu.seu.historycontest.excel;
 
 import cn.edu.seu.historycontest.Constants;
+import cn.edu.seu.historycontest.entity.ChoiceQuestion;
+import cn.edu.seu.historycontest.entity.JudgeQuestion;
+import cn.edu.seu.historycontest.entity.User;
 import cn.edu.seu.historycontest.excel.entity.ChoiceQuestionImportEntity;
 import cn.edu.seu.historycontest.excel.entity.JudgeQuestionImportEntity;
 import cn.edu.seu.historycontest.excel.entity.StudentExportEntity;
 import cn.edu.seu.historycontest.excel.entity.StudentImportEntity;
-import cn.edu.seu.historycontest.excel.listener.ImportChoiceQuestionListener;
-import cn.edu.seu.historycontest.excel.listener.ImportJudgeQuestionListener;
-import cn.edu.seu.historycontest.excel.listener.ImportStudentListener;
+import cn.edu.seu.historycontest.exception.StudentAlreadyExistsException;
 import cn.edu.seu.historycontest.payload.StudentListResponse;
 import cn.edu.seu.historycontest.service.ChoiceQuestionService;
 import cn.edu.seu.historycontest.service.DepartmentService;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,18 +85,55 @@ public class ExcelService {
     public void importStudent(InputStream inputStream, boolean cover) {
         if (cover)
             userService.deleteAllStudents();
-        EasyExcel.read(inputStream, StudentImportEntity.class, new ImportStudentListener(userService)).sheet().doRead();
+
+        List<StudentImportEntity> students = EasyExcel.read(inputStream).head(StudentImportEntity.class).sheet().doReadSync();
+        List<User> userList = new LinkedList<>();
+
+        for (StudentImportEntity student : students) {
+            if (null != userService.getStudentBySid(student.getSid()))
+                throw StudentAlreadyExistsException.bySid(student.getSid());
+            if (null != userService.getStudentByCardId(student.getCardId()))
+                throw StudentAlreadyExistsException.byCardId(student.getCardId());
+
+            User user = new User();
+            user.setSid(student.getSid());
+            user.setCardId(student.getCardId());
+            user.setName(student.getName());
+            userList.add(user);
+        }
+
+        userService.insertStudents(userList);
     }
 
     public void importChoiceQuestion(InputStream inputStream, boolean cover) {
         if (cover)
             choiceQuestionService.remove(null);
-        EasyExcel.read(inputStream, ChoiceQuestionImportEntity.class, new ImportChoiceQuestionListener(choiceQuestionService)).sheet().doRead();
+        List<ChoiceQuestionImportEntity> entities = EasyExcel.read(inputStream).head(ChoiceQuestionImportEntity.class).sheet().doReadSync();
+        List<ChoiceQuestion> questions = entities.stream().map(data -> {
+            ChoiceQuestion choiceQuestion = new ChoiceQuestion();
+            choiceQuestion.setQuestion(data.getQuestion());
+            choiceQuestion.setChoiceA(data.getChoiceA());
+            choiceQuestion.setChoiceB(data.getChoiceB());
+            choiceQuestion.setChoiceC(data.getChoiceC());
+            choiceQuestion.setChoiceD(data.getChoiceD());
+            choiceQuestion.setAnswer((int) Character.toUpperCase(data.getAnswer().charAt(0)) - (int) 'A');
+            return choiceQuestion;
+        }).collect(Collectors.toList());
+        choiceQuestionService.saveBatch(questions);
     }
 
     public void importJudgeQuestion(InputStream inputStream, boolean cover) {
         if (cover)
             judgeQuestionService.remove(null);
-        EasyExcel.read(inputStream, JudgeQuestionImportEntity.class, new ImportJudgeQuestionListener(judgeQuestionService)).sheet().doRead();
+
+        List<JudgeQuestionImportEntity> entities = EasyExcel.read(inputStream).head(JudgeQuestionImportEntity.class).sheet().doReadSync();
+        List<JudgeQuestion> questions = entities.stream().map(data -> {
+            JudgeQuestion judgeQuestion = new JudgeQuestion();
+            judgeQuestion.setQuestion(data.getQuestion());
+            judgeQuestion.setAnswer(data.getAnswer());
+            return judgeQuestion;
+        }).collect(Collectors.toList());
+
+        judgeQuestionService.saveBatch(questions);
     }
 }
