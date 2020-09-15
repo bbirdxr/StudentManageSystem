@@ -3,6 +3,7 @@ package cn.edu.seu.historycontest.config;
 import cn.edu.seu.historycontest.exception.ForbiddenException;
 import com.alibaba.excel.exception.ExcelDataConvertException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -38,5 +39,11 @@ public class GlobalExceptionConfig {
     public String handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         List<ObjectError> errors = e.getBindingResult().getAllErrors();
         return errors.get(0).getDefaultMessage();
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleBadCredentialsException(BadCredentialsException e) {
+        return "账号或密码错误，请重新登录";
     }
 }
