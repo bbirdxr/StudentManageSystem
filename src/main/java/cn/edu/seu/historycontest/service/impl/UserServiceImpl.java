@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -93,9 +94,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public void editStudent(User user) {
-        if (null != getStudentBySid(user.getSid()))
+        User foundUser = getStudentBySid(user.getSid());
+        if (null != foundUser && Objects.equals(user.getId(), foundUser.getId()))
             throw new ForbiddenException("学号已存在");
-        if (null != getStudentByCardId(user.getCardId()))
+        foundUser = getStudentByCardId(user.getCardId());
+        if (null != foundUser && Objects.equals(foundUser.getId(), user.getId()))
             throw new ForbiddenException("一卡通号已存在");
 
         fixStudent(user);
