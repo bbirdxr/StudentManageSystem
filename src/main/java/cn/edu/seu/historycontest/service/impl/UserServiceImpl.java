@@ -95,10 +95,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public void editStudent(User user) {
         User foundUser = getStudentBySid(user.getSid());
-        if (null != foundUser && Objects.equals(user.getId(), foundUser.getId()))
+        if (null != foundUser && !Objects.equals(user.getId(), foundUser.getId()))
             throw new ForbiddenException("学号已存在");
         foundUser = getStudentByCardId(user.getCardId());
-        if (null != foundUser && Objects.equals(foundUser.getId(), user.getId()))
+        if (null != foundUser && !Objects.equals(foundUser.getId(), user.getId()))
             throw new ForbiddenException("一卡通号已存在");
 
         fixStudent(user);
