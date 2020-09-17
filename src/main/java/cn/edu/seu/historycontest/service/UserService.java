@@ -22,6 +22,8 @@ public interface UserService extends IService<User> {
     void insertStudent(User user);
     void insertStudents(List<User> users);
     void deleteAllStudents();
+    void deleteStudent(Long id);
+    void deleteStudents(List<Long> ids);
     void editStudent(User user);
     void changePassword(UserPrincipal user, String oldPassword, String newPassword);
 

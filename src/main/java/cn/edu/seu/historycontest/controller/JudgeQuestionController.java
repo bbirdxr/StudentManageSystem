@@ -94,5 +94,11 @@ public class JudgeQuestionController {
     public Integer getCount() {
         return judgeQuestionService.list().size();
     }
+
+    @DeleteMapping("all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteAll() {
+        judgeQuestionService.remove(null);
+    }
 }
 

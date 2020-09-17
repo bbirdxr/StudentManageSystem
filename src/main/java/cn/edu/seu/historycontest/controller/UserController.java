@@ -88,13 +88,13 @@ public class UserController {
     @DeleteMapping("student/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteStudent(@PathVariable Long id) {
-        userService.removeById(id);
+        userService.deleteStudent(id);
     }
 
     @DeleteMapping("student")
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteStudents(@RequestBody List<Long> ids) {
-        userService.removeByIds(ids);
+        userService.deleteStudents(ids);
     }
 
     @PutMapping("student/insert")
@@ -130,6 +130,12 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public void importAndCover(@RequestParam(value = "file") MultipartFile upload) throws IOException {
         excelService.importStudent(upload.getInputStream(), true);
+    }
+
+    @DeleteMapping("student/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteAllStudent() {
+        userService.deleteAllStudents();
     }
 }
 

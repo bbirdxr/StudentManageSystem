@@ -92,5 +92,11 @@ public class ChoiceQuestionController {
     public Integer getCount() {
         return choiceQuestionService.list().size();
     }
+
+    @DeleteMapping("all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteAll() {
+        choiceQuestionService.removeAll();
+    }
 }
 

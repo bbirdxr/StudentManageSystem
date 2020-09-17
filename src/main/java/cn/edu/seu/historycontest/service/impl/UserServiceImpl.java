@@ -3,6 +3,7 @@ package cn.edu.seu.historycontest.service.impl;
 import cn.edu.seu.historycontest.Constants;
 import cn.edu.seu.historycontest.config.SecurityConfig;
 import cn.edu.seu.historycontest.entity.Department;
+import cn.edu.seu.historycontest.entity.Paper;
 import cn.edu.seu.historycontest.entity.User;
 import cn.edu.seu.historycontest.exception.ForbiddenException;
 import cn.edu.seu.historycontest.exception.StudentAlreadyExistsException;
@@ -149,6 +150,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("role", Constants.ROLE_STUDENT);
         remove(queryWrapper);
+        paperService.remove(null);
+    }
+
+    @Override
+    public void deleteStudent(Long id) {
+        removeById(id);
+
+        QueryWrapper<Paper> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("sid", id);
+        paperService.remove(queryWrapper);
+    }
+
+    @Override
+    public void deleteStudents(List<Long> ids) {
+        removeByIds(ids);
+        QueryWrapper<Paper> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in("sid", ids);
+        paperService.remove(queryWrapper);
     }
 
     @Override
