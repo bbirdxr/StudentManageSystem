@@ -121,7 +121,7 @@ public class UserController {
     @GetMapping("student/export")
     @PreAuthorize("hasRole('ADMIN')")
     public void exportStudentList(@CurrentUser UserPrincipal userPrincipal, HttpServletResponse response) throws IOException {
-        response.setContentType("application/vnd.ms-excel");
+        response.setContentType("application/octet-stream");
         response.setCharacterEncoding("utf-8");
         response.setHeader("Content-disposition", "attachment;filename=data.xlsx");
         if (Constants.STATUS_ALL.equals(userPrincipal.getStatus()))
