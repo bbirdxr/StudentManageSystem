@@ -11,6 +11,7 @@ import cn.edu.seu.historycontest.security.UserPrincipal;
 import cn.edu.seu.historycontest.service.PaperService;
 import cn.edu.seu.historycontest.service.UserService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.tomcat.util.bcel.Const;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -61,14 +63,20 @@ public class UserController {
 
     @PostMapping("student/page")
     @PreAuthorize("hasRole('ADMIN')")
-    public GetPageResponse getStudentPage(@Valid @RequestBody GetPageRequest pageRequest) {
-        return userService.getStudentPage(pageRequest.getPageIndex(), pageRequest.getPageSize());
+    public GetPageResponse getStudentPage(@CurrentUser UserPrincipal userPrincipal, @Valid @RequestBody GetPageRequest pageRequest) {
+        if (Objects.equals(userPrincipal.getStatus(), Constants.STATUS_ALL))
+            return userService.getStudentPage(pageRequest.getPageIndex(), pageRequest.getPageSize());
+        else
+            return userService.getStudentPage(pageRequest.getPageIndex(), pageRequest.getPageSize(), userPrincipal.getDepartment());
     }
 
     @PostMapping("student/query")
     @PreAuthorize("hasRole('ADMIN')")
-    public GetPageResponse getStudentPageWithCondition(@Valid @RequestBody QueryPageRequest pageRequest) {
-        return userService.getStudentPage(pageRequest.getPageIndex(), pageRequest.getPageSize(), pageRequest.getQueryType(), pageRequest.getQueryValue());
+    public GetPageResponse getStudentPageWithCondition(@CurrentUser UserPrincipal userPrincipal, @Valid @RequestBody QueryPageRequest pageRequest) {
+        if (Objects.equals(userPrincipal.getStatus(), Constants.STATUS_ALL))
+            return userService.getStudentPage(pageRequest.getPageIndex(), pageRequest.getPageSize(), pageRequest.getQueryType(), pageRequest.getQueryValue());
+        else
+            return userService.getStudentPage(pageRequest.getPageIndex(), pageRequest.getPageSize(), pageRequest.getQueryType(), pageRequest.getQueryValue(), userPrincipal.getDepartment());
     }
 
     @GetMapping("student/list")
@@ -136,6 +144,58 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteAllStudent() {
         userService.deleteAllStudents();
+    }
+
+    @DeleteMapping("admin/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteAdmin(@PathVariable Long id) {
+        userService.removeById(id);
+    }
+
+    @DeleteMapping("admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteAdmins(@RequestBody List<Long> ids) {
+        userService.removeByIds(ids);
+    }
+
+    @DeleteMapping("admin/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteAllAdmins() {
+        userService.deleteAllAdmins();
+    }
+
+    @GetMapping("admin/list")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<User> getAdminList() {
+        return userService.getAdminList();
+    }
+
+    @PutMapping("admin/insert")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void insertAdmin(@Valid @RequestBody EditAdminRequest admin) {
+        User user = new User();
+        BeanUtils.copyProperties(admin, user);
+        userService.insertAdmin(user);
+    }
+
+    @PutMapping("admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void editAdmin(@Valid @RequestBody EditAdminRequest admin) {
+        User user = new User();
+        BeanUtils.copyProperties(admin, user);
+        userService.editAdmin(user);
+    }
+
+    @PostMapping("admin/import/insert")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void importAndInsertAdmin(@RequestParam(value = "file") MultipartFile upload) throws IOException {
+        excelService.importAdmin(upload.getInputStream(), false);
+    }
+
+    @PostMapping("admin/import/cover")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void importAndCoverAdmin(@RequestParam(value = "file") MultipartFile upload) throws IOException {
+        excelService.importAdmin(upload.getInputStream(), true);
     }
 }
 

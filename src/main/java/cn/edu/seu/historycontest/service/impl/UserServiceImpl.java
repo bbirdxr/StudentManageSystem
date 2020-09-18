@@ -6,7 +6,7 @@ import cn.edu.seu.historycontest.entity.Department;
 import cn.edu.seu.historycontest.entity.Paper;
 import cn.edu.seu.historycontest.entity.User;
 import cn.edu.seu.historycontest.exception.ForbiddenException;
-import cn.edu.seu.historycontest.exception.StudentAlreadyExistsException;
+import cn.edu.seu.historycontest.exception.UserAlreadyExistException;
 import cn.edu.seu.historycontest.mapper.UserMapper;
 import cn.edu.seu.historycontest.payload.GetPageResponse;
 import cn.edu.seu.historycontest.payload.StudentListResponse;
@@ -58,15 +58,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public GetPageResponse getStudentPage(long current, long size) {
+        return getStudentPage(current, size, -1);
+    }
+
+    @Override
+    public GetPageResponse getStudentPage(long current, long size, long department) {
         Page<User> page = new Page<>(current, size);
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("role", Constants.ROLE_STUDENT);
+
+        if (-1 != department)
+            queryWrapper.eq("department", department);
 
         return queryPage(page, queryWrapper);
     }
 
     @Override
     public GetPageResponse getStudentPage(long current, long size, String queryType, String queryValue) {
+        return getStudentPage(current, size, queryType, queryValue, -1);
+    }
+
+    @Override
+    public GetPageResponse getStudentPage(long current, long size, String queryType, String queryValue, long department) {
         Page<User> page = new Page<>(current, size);
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("role", Constants.ROLE_STUDENT);
@@ -80,6 +93,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             else
                 queryWrapper.eq(queryType, queryValue);
         }
+        if (-1 != department)
+            queryWrapper.eq("department", department);
         return queryPage(page, queryWrapper);
     }
 
@@ -97,11 +112,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public void editStudent(User user) {
         User foundUser = getStudentBySid(user.getSid());
         if (null != foundUser && !Objects.equals(user.getId(), foundUser.getId()))
-            throw new ForbiddenException("学号已存在");
-        foundUser = getStudentByCardId(user.getCardId());
+            throw UserAlreadyExistException.bySid(user.getSid());
+        foundUser = getByCardId(user.getCardId());
         if (null != foundUser && !Objects.equals(foundUser.getId(), user.getId()))
-            throw new ForbiddenException("一卡通号已存在");
-
+            throw UserAlreadyExistException.byCardId(user.getCardId());
         fixStudent(user);
         updateById(user);
     }
@@ -120,9 +134,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public void insertStudent(User user) {
         if (null != getStudentBySid(user.getSid()))
-            throw StudentAlreadyExistsException.bySid(user.getSid());
-        if (null != getStudentByCardId(user.getCardId()))
-            throw StudentAlreadyExistsException.byCardId(user.getCardId());
+            throw UserAlreadyExistException.bySid(user.getSid());
+        if (null != getByCardId(user.getCardId()))
+            throw UserAlreadyExistException.byCardId(user.getCardId());
 
         user.setRole(Constants.ROLE_STUDENT);
         user.setStatus(Constants.STATUS_NOT_START);
@@ -134,9 +148,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public void insertStudents(List<User> users) {
         for (User user : users) {
             if (null != getStudentBySid(user.getSid()))
-                throw StudentAlreadyExistsException.bySid(user.getSid());
-            if (null != getStudentByCardId(user.getCardId()))
-                throw StudentAlreadyExistsException.byCardId(user.getCardId());
+                throw UserAlreadyExistException.bySid(user.getSid());
+            if (null != getByCardId(user.getCardId()))
+                throw UserAlreadyExistException.byCardId(user.getCardId());
 
             user.setRole(Constants.ROLE_STUDENT);
             user.setStatus(Constants.STATUS_NOT_START);
@@ -158,7 +172,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         removeById(id);
 
         QueryWrapper<Paper> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("sid", id);
+        queryWrapper.eq("uid", id);
         paperService.remove(queryWrapper);
     }
 
@@ -166,7 +180,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public void deleteStudents(List<Long> ids) {
         removeByIds(ids);
         QueryWrapper<Paper> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in("sid", ids);
+        queryWrapper.in("uid", ids);
         paperService.remove(queryWrapper);
     }
 
@@ -178,7 +192,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public User getStudentByCardId(String cardId) {
+    public User getByCardId(String cardId) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("card_id", cardId.replaceAll("\\s*", ""));
         return getOne(queryWrapper);
@@ -187,6 +201,56 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public Integer getStudentCount() {
         return getAllStudent().size();
+    }
+
+    @Override
+    public void deleteAllAdmins() {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("role", Constants.ROLE_ADMIN);
+        remove(queryWrapper);
+        paperService.remove(null);
+    }
+
+    @Override
+    public List<User> getAdminList() {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("role", Constants.ROLE_ADMIN);
+        return list(queryWrapper);
+    }
+
+    @Override
+    public void insertAdmin(User user) {
+        if (null != getByCardId(user.getCardId()))
+            throw UserAlreadyExistException.byCardId(user.getCardId());
+
+        user.setRole(Constants.ROLE_ADMIN);
+        user.setStatus(Constants.STATUS_DEPARTMENT);
+        user.setSid(user.getCardId().replaceAll("\\s*", ""));
+        user.setCardId(user.getCardId().replaceAll("\\s*", ""));
+        save(user);
+    }
+
+    @Override
+    public void insertAdmins(List<User> admins) {
+        for (User user : admins) {
+            if (null != getByCardId(user.getCardId()))
+                throw UserAlreadyExistException.byCardId(user.getCardId());
+
+            user.setRole(Constants.ROLE_ADMIN);
+            user.setStatus(Constants.STATUS_DEPARTMENT);
+        }
+        saveBatch(admins);
+    }
+
+    @Override
+    public void editAdmin(User user) {
+        User foundUser = getByCardId(user.getCardId());
+        if (null != foundUser && !Objects.equals(foundUser.getId(), user.getId()))
+            throw UserAlreadyExistException.byCardId(user.getCardId());
+
+        user.setSid(user.getCardId().replaceAll("\\s*", ""));
+        user.setCardId(user.getCardId().replaceAll("\\s*", ""));
+        updateById(user);
     }
 
     @Override

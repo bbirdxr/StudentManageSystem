@@ -4,11 +4,8 @@ import cn.edu.seu.historycontest.Constants;
 import cn.edu.seu.historycontest.entity.ChoiceQuestion;
 import cn.edu.seu.historycontest.entity.JudgeQuestion;
 import cn.edu.seu.historycontest.entity.User;
-import cn.edu.seu.historycontest.excel.entity.ChoiceQuestionImportEntity;
-import cn.edu.seu.historycontest.excel.entity.JudgeQuestionImportEntity;
-import cn.edu.seu.historycontest.excel.entity.StudentExportEntity;
-import cn.edu.seu.historycontest.excel.entity.StudentImportEntity;
-import cn.edu.seu.historycontest.exception.StudentAlreadyExistsException;
+import cn.edu.seu.historycontest.excel.entity.*;
+import cn.edu.seu.historycontest.exception.UserAlreadyExistException;
 import cn.edu.seu.historycontest.payload.StudentListResponse;
 import cn.edu.seu.historycontest.service.ChoiceQuestionService;
 import cn.edu.seu.historycontest.service.DepartmentService;
@@ -91,9 +88,9 @@ public class ExcelService {
 
         for (StudentImportEntity student : students) {
             if (null != userService.getStudentBySid(student.getSid()))
-                throw StudentAlreadyExistsException.bySid(student.getSid());
-            if (null != userService.getStudentByCardId(student.getCardId()))
-                throw StudentAlreadyExistsException.byCardId(student.getCardId());
+                throw UserAlreadyExistException.bySid(student.getSid());
+            if (null != userService.getByCardId(student.getCardId()))
+                throw UserAlreadyExistException.byCardId(student.getCardId());
 
             User user = new User();
             user.setSid(student.getSid());
@@ -135,5 +132,27 @@ public class ExcelService {
         }).collect(Collectors.toList());
 
         judgeQuestionService.saveBatch(questions);
+    }
+
+    public void importAdmin(InputStream inputStream, boolean cover) {
+        if (cover)
+            userService.deleteAllAdmins();
+
+        List<AdminImportEntity> students = EasyExcel.read(inputStream).head(AdminImportEntity.class).sheet().doReadSync();
+        List<User> userList = new LinkedList<>();
+
+        for (AdminImportEntity admin : students) {
+            if (null != userService.getByCardId(admin.getCardId()))
+                throw UserAlreadyExistException.byCardId(admin.getCardId());
+
+            User user = new User();
+            user.setSid(admin.getCardId());
+            user.setCardId(admin.getCardId());
+            user.setName(admin.getName());
+            user.setDepartment(departmentService.getIdByName(admin.getDepartment()));
+            userList.add(user);
+        }
+
+        userService.insertAdmins(userList);
     }
 }

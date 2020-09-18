@@ -14,5 +14,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface DepartmentService extends IService<Department> {
 
     String getNameById(Integer id);
+    Integer getIdByName(String name);
 
 }

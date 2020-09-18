@@ -10,6 +10,9 @@ public class Constants {
     public static String STATUS_SUBMITTED = "STATUS_SUBMITTED";
     public static String STATUS_NOT_SUBMITTED = "STATUS_NOT_SUBMITTED";
 
+    public static String STATUS_ALL = "STATUS_ALL";
+    public static String STATUS_DEPARTMENT = "STATUS_DEPARTMENT";
+
     public static int TOTAL_CHOICE_QUESTION = 20;
     public static int TOTAL_JUDGE_QUESTION = 10;
     public static int CHOICE_QUESTION_SCORE = 4;

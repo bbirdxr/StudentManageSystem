@@ -26,4 +26,12 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
         else
             return "无法识别";
     }
+
+    @Override
+    public Integer getIdByName(String name) {
+        QueryWrapper<Department> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("name", name);
+        Department department = getOne(queryWrapper);
+        return department.getId();
+    }
 }
