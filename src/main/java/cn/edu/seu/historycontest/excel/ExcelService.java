@@ -5,6 +5,7 @@ import cn.edu.seu.historycontest.entity.ChoiceQuestion;
 import cn.edu.seu.historycontest.entity.JudgeQuestion;
 import cn.edu.seu.historycontest.entity.User;
 import cn.edu.seu.historycontest.excel.entity.*;
+import cn.edu.seu.historycontest.exception.ForbiddenException;
 import cn.edu.seu.historycontest.exception.UserAlreadyExistException;
 import cn.edu.seu.historycontest.payload.StudentListResponse;
 import cn.edu.seu.historycontest.service.ChoiceQuestionService;
@@ -18,6 +19,7 @@ import com.alibaba.excel.write.metadata.style.WriteFont;
 import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -79,9 +81,10 @@ public class ExcelService {
         }).collect(Collectors.toList());
     }
 
-    public void importStudent(InputStream inputStream, boolean cover) {
+    @Transactional
+    public void importStudent(long department, InputStream inputStream, boolean cover) {
         if (cover)
-            userService.deleteAllStudents();
+            userService.deleteAllStudents(department);
 
         List<StudentImportEntity> students = EasyExcel.read(inputStream).head(StudentImportEntity.class).sheet().doReadSync();
         List<User> userList = new LinkedList<>();
@@ -91,6 +94,9 @@ public class ExcelService {
                 throw UserAlreadyExistException.bySid(student.getSid());
             if (null != userService.getByCardId(student.getCardId()))
                 throw UserAlreadyExistException.byCardId(student.getCardId());
+
+            if (department != -1 && department != departmentService.getIdBySid(student.getSid()))
+                throw new ForbiddenException("请先删除不属于" + departmentService.getNameById((int) department) + "的学生");
 
             User user = new User();
             user.setSid(student.getSid());
@@ -102,6 +108,7 @@ public class ExcelService {
         userService.insertStudents(userList);
     }
 
+    @Transactional
     public void importChoiceQuestion(InputStream inputStream, boolean cover) {
         if (cover)
             choiceQuestionService.remove(null);
@@ -119,6 +126,7 @@ public class ExcelService {
         choiceQuestionService.saveBatch(questions);
     }
 
+    @Transactional
     public void importJudgeQuestion(InputStream inputStream, boolean cover) {
         if (cover)
             judgeQuestionService.remove(null);
@@ -134,6 +142,7 @@ public class ExcelService {
         judgeQuestionService.saveBatch(questions);
     }
 
+    @Transactional
     public void importAdmin(InputStream inputStream, boolean cover) {
         if (cover)
             userService.deleteAllAdmins();

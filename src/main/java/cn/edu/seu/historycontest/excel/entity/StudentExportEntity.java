@@ -1,11 +1,7 @@
 package cn.edu.seu.historycontest.excel.entity;
 
-import cn.edu.seu.historycontest.Constants;
-import cn.edu.seu.historycontest.payload.StudentListResponse;
 import com.alibaba.excel.annotation.ExcelProperty;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 public class StudentExportEntity {

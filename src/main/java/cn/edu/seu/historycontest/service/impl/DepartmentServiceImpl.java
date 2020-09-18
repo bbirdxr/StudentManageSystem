@@ -34,4 +34,14 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
         Department department = getOne(queryWrapper);
         return department.getId();
     }
+
+    @Override
+    public Integer getIdBySid(String sid) {
+        QueryWrapper<Department> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("prefix", sid.substring(0, 2));
+        Department department = getOne(queryWrapper);
+        if (department != null)
+            return department.getId();
+        return -1;
+    }
 }

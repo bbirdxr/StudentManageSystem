@@ -1,10 +1,7 @@
 package cn.edu.seu.historycontest.service.impl;
 
 import cn.edu.seu.historycontest.entity.User;
-import cn.edu.seu.historycontest.exception.ForbiddenException;
-import cn.edu.seu.historycontest.payload.LoginResponse;
 import cn.edu.seu.historycontest.security.JwtTokenProvider;
-import cn.edu.seu.historycontest.security.UserPrincipal;
 import cn.edu.seu.historycontest.service.AuthService;
 import cn.edu.seu.historycontest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +10,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
 
 @Service
 public class AuthServiceImpl implements AuthService {

@@ -1,9 +1,7 @@
 package cn.edu.seu.historycontest.security;
 
 import cn.edu.seu.historycontest.entity.User;
-import cn.edu.seu.historycontest.exception.ResourceNotFoundException;
 import cn.edu.seu.historycontest.mapper.UserMapper;
-import cn.edu.seu.historycontest.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

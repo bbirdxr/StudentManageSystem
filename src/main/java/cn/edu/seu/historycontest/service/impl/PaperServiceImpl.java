@@ -136,8 +136,11 @@ public class PaperServiceImpl extends ServiceImpl<PaperMapper, Paper> implements
     @Override
     public void submitPaper(UserPrincipal user, List<Integer> choiceAnswers, List<Integer> judgeAnswers) {
         Paper paper = getPaperFromUid(user.getId());
-        if (new Date().getTime() - paper.getStartTime().getTime() > Constants.TIME_LIMIT)
+        long usedTime = new Date().getTime() - paper.getStartTime().getTime();
+        if (usedTime > Constants.TIME_LIMIT)
             throw new ForbiddenException("超时");
+        if (usedTime < Constants.TIME_MIN)
+            throw new ForbiddenException("答题时间过短，请认真答题");
 
         user.setStatus(Constants.STATUS_SUBMITTED);
         userService.updateById(user.toUser());

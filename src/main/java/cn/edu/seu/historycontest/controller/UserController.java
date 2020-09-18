@@ -2,21 +2,15 @@ package cn.edu.seu.historycontest.controller;
 
 
 import cn.edu.seu.historycontest.Constants;
-import cn.edu.seu.historycontest.entity.ChoiceQuestion;
 import cn.edu.seu.historycontest.entity.User;
 import cn.edu.seu.historycontest.excel.ExcelService;
 import cn.edu.seu.historycontest.payload.*;
 import cn.edu.seu.historycontest.security.CurrentUser;
 import cn.edu.seu.historycontest.security.UserPrincipal;
-import cn.edu.seu.historycontest.service.PaperService;
 import cn.edu.seu.historycontest.service.UserService;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.tomcat.util.bcel.Const;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,9 +19,6 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -87,30 +78,38 @@ public class UserController {
 
     @PutMapping("student/edit")
     @PreAuthorize("hasRole('ADMIN')")
-    public void editStudent(@Valid @RequestBody EditStudentRequest student) {
+    public void editStudent(@CurrentUser UserPrincipal userPrincipal, @Valid @RequestBody EditStudentRequest student) {
         User user = new User();
         BeanUtils.copyProperties(student, user);
+        if (Objects.equals(userPrincipal.getStatus(), Constants.STATUS_ALL))
         userService.editStudent(user);
+        else userService.editStudent(userPrincipal.getDepartment(), user);
     }
 
     @DeleteMapping("student/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteStudent(@PathVariable Long id) {
-        userService.deleteStudent(id);
+    public void deleteStudent(@CurrentUser UserPrincipal userPrincipal, @PathVariable Long id) {
+        if (Objects.equals(userPrincipal.getStatus(), Constants.STATUS_ALL))
+         userService.deleteStudent(id);
+        else userService.deleteStudent(userPrincipal.getDepartment(), id);
     }
 
     @DeleteMapping("student")
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteStudents(@RequestBody List<Long> ids) {
-        userService.deleteStudents(ids);
+    public void deleteStudents(@CurrentUser UserPrincipal userPrincipal, @RequestBody List<Long> ids) {
+        if (Objects.equals(userPrincipal.getStatus(), Constants.STATUS_ALL))
+            userService.deleteStudents(ids);
+        else userService.deleteStudents(userPrincipal.getDepartment(), ids);
     }
 
     @PutMapping("student/insert")
     @PreAuthorize("hasRole('ADMIN')")
-    public void insertStudent(@Valid @RequestBody EditStudentRequest student) {
+    public void insertStudent(@CurrentUser UserPrincipal userPrincipal, @Valid @RequestBody EditStudentRequest student) {
         User user = new User();
         BeanUtils.copyProperties(student, user);
-        userService.insertStudent(user);
+        if (Objects.equals(userPrincipal.getStatus(), Constants.STATUS_ALL))
+            userService.insertStudent(user);
+        else userService.insertStudent(userPrincipal.getDepartment(), user);
     }
 
     @PutMapping("password")
@@ -132,20 +131,26 @@ public class UserController {
 
     @PostMapping("student/import/insert")
     @PreAuthorize("hasRole('ADMIN')")
-    public void importAndInsert(@RequestParam(value = "file") MultipartFile upload) throws IOException {
-        excelService.importStudent(upload.getInputStream(), false);
+    public void importAndInsert(@CurrentUser UserPrincipal userPrincipal, @RequestParam(value = "file") MultipartFile upload) throws IOException {
+        if (Constants.STATUS_ALL.equals(userPrincipal.getStatus()))
+        excelService.importStudent(-1, upload.getInputStream(), false);
+        excelService.importStudent(userPrincipal.getDepartment(), upload.getInputStream(), false);
     }
 
     @PostMapping("student/import/cover")
     @PreAuthorize("hasRole('ADMIN')")
-    public void importAndCover(@RequestParam(value = "file") MultipartFile upload) throws IOException {
-        excelService.importStudent(upload.getInputStream(), true);
+    public void importAndCover(@CurrentUser UserPrincipal userPrincipal, @RequestParam(value = "file") MultipartFile upload) throws IOException {
+        if (Constants.STATUS_ALL.equals(userPrincipal.getStatus()))
+            excelService.importStudent(-1, upload.getInputStream(), true);
+        excelService.importStudent(userPrincipal.getDepartment(), upload.getInputStream(), true);
     }
 
     @DeleteMapping("student/all")
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteAllStudent() {
-        userService.deleteAllStudents();
+    public void deleteAllStudent(@CurrentUser UserPrincipal userPrincipal) {
+        if (Constants.STATUS_ALL.equals(userPrincipal.getStatus()))
+            userService.deleteAllStudents();
+        else userService.deleteAllStudents(userPrincipal.getDepartment());
     }
 
     @DeleteMapping("admin/{id}")

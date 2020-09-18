@@ -19,4 +19,5 @@ public class Constants {
     public static int JUDGE_QUESTION_SCORE = 2;
 
     public static int TIME_LIMIT = 30 * 60 * 1000 + 30 * 1000;
+    public static int TIME_MIN = 60 * 1000;
 }

@@ -5,7 +5,10 @@ import cn.edu.seu.historycontest.payload.LoginResponse;
 import cn.edu.seu.historycontest.payload.RegisterRequest;
 import cn.edu.seu.historycontest.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 

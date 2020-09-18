@@ -4,10 +4,8 @@ import cn.edu.seu.historycontest.entity.User;
 import cn.edu.seu.historycontest.payload.GetPageResponse;
 import cn.edu.seu.historycontest.payload.StudentListResponse;
 import cn.edu.seu.historycontest.security.UserPrincipal;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
-import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -20,14 +18,19 @@ import java.util.List;
  */
 public interface UserService extends IService<User> {
     void insertStudent(User user);
+    void insertStudent(long department, User user);
     void insertStudents(List<User> users);
     void insertAdmin(User user);
     void insertAdmins(List<User> admins);
     void deleteAllStudents();
+    void deleteAllStudents(long department);
     void deleteAllAdmins();
     void deleteStudent(Long id);
+    void deleteStudent(long department, Long id);
     void deleteStudents(List<Long> ids);
+    void deleteStudents(long department, List<Long> ids);
     void editStudent(User user);
+    void editStudent(long department, User user);
     void editAdmin(User user);
     void changePassword(UserPrincipal user, String oldPassword, String newPassword);
 

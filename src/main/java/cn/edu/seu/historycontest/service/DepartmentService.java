@@ -15,5 +15,6 @@ public interface DepartmentService extends IService<Department> {
 
     String getNameById(Integer id);
     Integer getIdByName(String name);
+    Integer getIdBySid(String sid);
 
 }

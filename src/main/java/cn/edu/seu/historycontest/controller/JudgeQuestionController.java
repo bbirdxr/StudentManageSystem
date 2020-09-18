@@ -1,12 +1,10 @@
 package cn.edu.seu.historycontest.controller;
 
 
-import cn.edu.seu.historycontest.entity.ChoiceQuestion;
 import cn.edu.seu.historycontest.entity.JudgeQuestion;
 import cn.edu.seu.historycontest.excel.ExcelService;
 import cn.edu.seu.historycontest.payload.GetPageRequest;
 import cn.edu.seu.historycontest.payload.GetPageResponse;
-import cn.edu.seu.historycontest.service.ChoiceQuestionService;
 import cn.edu.seu.historycontest.service.JudgeQuestionService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;

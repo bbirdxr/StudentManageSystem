@@ -2,9 +2,9 @@ package cn.edu.seu.historycontest.service.impl;
 
 import cn.edu.seu.historycontest.Constants;
 import cn.edu.seu.historycontest.config.SecurityConfig;
-import cn.edu.seu.historycontest.entity.Department;
 import cn.edu.seu.historycontest.entity.Paper;
 import cn.edu.seu.historycontest.entity.User;
+import cn.edu.seu.historycontest.exception.DepartmentNotMatchesException;
 import cn.edu.seu.historycontest.exception.ForbiddenException;
 import cn.edu.seu.historycontest.exception.UserAlreadyExistException;
 import cn.edu.seu.historycontest.mapper.UserMapper;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author ${author}
@@ -101,8 +101,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     queryWrapper.ne(queryType, Constants.STATUS_SUBMITTED);
                 else
                     queryWrapper.eq(queryType, Constants.STATUS_SUBMITTED);
-            }
-            else
+            } else
                 queryWrapper.eq(queryType, queryValue);
         }
         if (-1 != department)
@@ -122,6 +121,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public void editStudent(User user) {
+        editStudent(-1, user);
+    }
+
+    @Override
+    public void editStudent(long department, User user) {
         User foundUser = getStudentBySid(user.getSid());
         if (null != foundUser && !Objects.equals(user.getId(), foundUser.getId()))
             throw UserAlreadyExistException.bySid(user.getSid());
@@ -129,22 +133,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (null != foundUser && !Objects.equals(foundUser.getId(), user.getId()))
             throw UserAlreadyExistException.byCardId(user.getCardId());
         fixStudent(user);
+
+        if (department != -1 && department != user.getDepartment())
+            throw DepartmentNotMatchesException.ofDepartment(departmentService.getNameById((int) department));
         updateById(user);
     }
 
     private void fixStudent(User user) {
         user.setSid(user.getSid().replaceAll("\\s*", ""));
         user.setCardId(user.getCardId().replaceAll("\\s*", ""));
-
-        QueryWrapper<Department> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("prefix", user.getSid().substring(0, 2));
-        Department department = departmentService.getOne(queryWrapper);
-        if (department != null)
-            user.setDepartment(department.getId());
+        user.setDepartment(departmentService.getIdBySid(user.getSid()));
     }
 
     @Override
     public void insertStudent(User user) {
+        insertStudent(-1, user);
+    }
+
+    @Override
+    public void insertStudent(long department, User user) {
         if (null != getStudentBySid(user.getSid()))
             throw UserAlreadyExistException.bySid(user.getSid());
         if (null != getByCardId(user.getCardId()))
@@ -153,6 +160,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setRole(Constants.ROLE_STUDENT);
         user.setStatus(Constants.STATUS_NOT_START);
         fixStudent(user);
+        if (department != -1 && department != user.getDepartment())
+            throw DepartmentNotMatchesException.ofDepartment(departmentService.getNameById((int) department));
         save(user);
     }
 
@@ -173,14 +182,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public void deleteAllStudents() {
+        deleteAllStudents(-1);
+    }
+
+    @Override
+    public void deleteAllStudents(long department) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("role", Constants.ROLE_STUDENT);
+        if (-1 != department)
+            queryWrapper.eq("department", department);
         remove(queryWrapper);
         paperService.remove(null);
     }
 
     @Override
     public void deleteStudent(Long id) {
+        deleteStudent(-1, id);
+    }
+
+    @Override
+    public void deleteStudent(long department, Long id) {
+        if (department != -1 && department != getById(id).getDepartment())
+            throw DepartmentNotMatchesException.ofDepartment(departmentService.getNameById((int) department));
         removeById(id);
 
         QueryWrapper<Paper> queryWrapper = new QueryWrapper<>();
@@ -190,6 +213,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public void deleteStudents(List<Long> ids) {
+        deleteStudents(-1, ids);
+    }
+
+    @Override
+    public void deleteStudents(long department, List<Long> ids) {
+        if (department != -1)
+            for (Long id : ids) {
+                if (department != getById(id).getDepartment())
+                    throw DepartmentNotMatchesException.ofDepartment(departmentService.getNameById((int) department));
+            }
+
         removeByIds(ids);
         QueryWrapper<Paper> queryWrapper = new QueryWrapper<>();
         queryWrapper.in("uid", ids);
