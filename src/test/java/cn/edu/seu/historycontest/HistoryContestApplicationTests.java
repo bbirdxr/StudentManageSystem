@@ -12,7 +12,6 @@ class HistoryContestApplicationTests {
     @Autowired
     private DepartmentService departmentService;
 
-
     void insertDepartment() {
         departmentService.save(new Department("01", "建筑学类"));
         departmentService.save(new Department("G1", "机械能源材料类"));
