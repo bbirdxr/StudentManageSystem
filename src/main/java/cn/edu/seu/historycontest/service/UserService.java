@@ -32,7 +32,9 @@ public interface UserService extends IService<User> {
     void changePassword(UserPrincipal user, String oldPassword, String newPassword);
 
     List<User> getAllStudent();
+    List<User> getAllStudent(long department);
     List<StudentListResponse> getStudentList();
+    List<StudentListResponse> getStudentList(long department);
     List<User> getAdminList();
     GetPageResponse getStudentPage(long current, long size);
     GetPageResponse getStudentPage(long current, long size, long department);

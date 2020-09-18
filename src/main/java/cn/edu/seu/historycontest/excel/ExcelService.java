@@ -40,8 +40,8 @@ public class ExcelService {
     @Autowired
     private DepartmentService departmentService;
 
-    public void exportStudentList(OutputStream outputStream) {
-        List<StudentExportEntity> list = prepareStudentList();
+    public void exportStudentList(long department, OutputStream outputStream) {
+        List<StudentExportEntity> list = prepareStudentList(department);
 
         WriteCellStyle style = new WriteCellStyle();
         WriteFont font = new WriteFont();
@@ -62,8 +62,8 @@ public class ExcelService {
 
     }
 
-    private List<StudentExportEntity> prepareStudentList() {
-        List<StudentListResponse> studentList = userService.getStudentList();
+    private List<StudentExportEntity> prepareStudentList(long department) {
+        List<StudentListResponse> studentList = userService.getStudentList(department);
         return studentList.stream().map(response -> {
             StudentExportEntity studentExcelEntity = new StudentExportEntity();
             studentExcelEntity.setSid(response.getSid());

@@ -44,14 +44,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public List<User> getAllStudent() {
+        return getAllStudent(-1);
+    }
+
+    @Override
+    public List<User> getAllStudent(long department) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("role", Constants.ROLE_STUDENT);
+        if (-1 != department)
+            queryWrapper.eq("department", department);
         return list(queryWrapper);
     }
 
     @Override
     public List<StudentListResponse> getStudentList() {
-        List<User> student = getAllStudent();
+        return getStudentList(-1);
+    }
+
+    @Override
+    public List<StudentListResponse> getStudentList(long department) {
+        List<User> student = getAllStudent(department);
         return student.stream().map(user ->
                 StudentListResponse.ofUser(user, paperService.getScore(user.getId()))).collect(Collectors.toList());
     }

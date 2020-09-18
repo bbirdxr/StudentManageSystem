@@ -121,11 +121,13 @@ public class UserController {
 
     @GetMapping("student/export")
     @PreAuthorize("hasRole('ADMIN')")
-    public void exportStudentList(HttpServletResponse response) throws IOException {
+    public void exportStudentList(@CurrentUser UserPrincipal userPrincipal, HttpServletResponse response) throws IOException {
         response.setContentType("application/vnd.ms-excel");
         response.setCharacterEncoding("utf-8");
         response.setHeader("Content-disposition", "attachment;filename=data.xlsx");
-        excelService.exportStudentList(response.getOutputStream());
+        if (Constants.STATUS_ALL.equals(userPrincipal.getStatus()))
+            excelService.exportStudentList(-1, response.getOutputStream());
+        else excelService.exportStudentList(userPrincipal.getDepartment(), response.getOutputStream());
     }
 
     @PostMapping("student/import/insert")

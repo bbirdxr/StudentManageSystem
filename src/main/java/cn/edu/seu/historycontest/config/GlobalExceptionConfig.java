@@ -1,6 +1,7 @@
 package cn.edu.seu.historycontest.config;
 
 import cn.edu.seu.historycontest.exception.ForbiddenException;
+import com.alibaba.excel.exception.ExcelAnalysisException;
 import com.alibaba.excel.exception.ExcelDataConvertException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -45,5 +46,11 @@ public class GlobalExceptionConfig {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleBadCredentialsException(BadCredentialsException e) {
         return "账号或密码错误，请重新登录";
+    }
+
+    @ExceptionHandler(ExcelAnalysisException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleExcelAnalysisException() {
+        return "导入失败，请重试";
     }
 }
