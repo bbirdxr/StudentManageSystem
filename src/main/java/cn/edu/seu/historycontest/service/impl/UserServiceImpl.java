@@ -253,6 +253,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public void deleteAllAdmins() {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("role", Constants.ROLE_ADMIN);
+        queryWrapper.ne("status", Constants.STATUS_ALL);
         remove(queryWrapper);
         paperService.remove(null);
     }
