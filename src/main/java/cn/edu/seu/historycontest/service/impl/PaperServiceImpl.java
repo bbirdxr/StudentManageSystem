@@ -18,6 +18,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,6 +44,7 @@ public class PaperServiceImpl extends ServiceImpl<PaperMapper, Paper> implements
     private JudgeQuestionService judgeQuestionService;
 
     @Override
+    @Transactional
     public DetailedPaper generatePaper(UserPrincipal userPrincipal) {
         QueryWrapper<Paper> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("uid", userPrincipal.getId());
@@ -134,6 +136,7 @@ public class PaperServiceImpl extends ServiceImpl<PaperMapper, Paper> implements
     }
 
     @Override
+    @Transactional
     public void submitPaper(UserPrincipal user, List<Integer> choiceAnswers, List<Integer> judgeAnswers) {
         Paper paper = getPaperFromUid(user.getId());
         long usedTime = new Date().getTime() - paper.getStartTime().getTime();
@@ -179,6 +182,7 @@ public class PaperServiceImpl extends ServiceImpl<PaperMapper, Paper> implements
     }
 
     @Override
+    @Transactional
     public void calibrateTime(UserPrincipal userPrincipal, Date startTime) {
         userPrincipal.setStatus(Constants.STATUS_STARTED);
         userService.updateById(userPrincipal.toUser());
