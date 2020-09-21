@@ -102,7 +102,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 else
                     queryWrapper.eq(queryType, Constants.STATUS_SUBMITTED);
             } else
-                queryWrapper.eq(queryType, queryValue);
+                queryWrapper.like(queryType, "%" + queryValue + "%");
         }
         if (-1 != department)
             queryWrapper.eq("department", department);

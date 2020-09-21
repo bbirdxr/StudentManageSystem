@@ -7,6 +7,7 @@ import cn.edu.seu.historycontest.entity.User;
 import cn.edu.seu.historycontest.excel.entity.*;
 import cn.edu.seu.historycontest.exception.ForbiddenException;
 import cn.edu.seu.historycontest.exception.UserAlreadyExistException;
+import cn.edu.seu.historycontest.payload.DepartmentStatistics;
 import cn.edu.seu.historycontest.payload.StudentListResponse;
 import cn.edu.seu.historycontest.service.ChoiceQuestionService;
 import cn.edu.seu.historycontest.service.DepartmentService;
@@ -25,6 +26,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,6 +64,43 @@ public class ExcelService {
                 excelWriter.finish();
         }
 
+    }
+
+    public void exportDepartmentStatistics(OutputStream outputStream) {
+        List<DepartmentStatistics> statistics = departmentService.getStatistics();
+        List<DepartmentExportEntity> entities = statistics.stream().map(departmentStatistics -> {
+            DepartmentExportEntity entity = new DepartmentExportEntity();
+            entity.setName(departmentStatistics.getDepartment().getName());
+            entity.setTotalPerson(departmentStatistics.getTotalPerson());
+            entity.setSubmittedPerson(departmentStatistics.getSubmittedPerson());
+            if (departmentStatistics.getTotalPerson() == null || Integer.valueOf(0).equals(departmentStatistics.getTotalPerson()))
+                entity.setAverageAll(0.0);
+            else
+                entity.setAverageAll(departmentStatistics.getTotalScore() / (double) departmentStatistics.getTotalPerson());
+
+            if (departmentStatistics.getSubmittedPerson() == null || Integer.valueOf(0).equals(departmentStatistics.getSubmittedPerson()))
+                entity.setAverageAllSubmitted(0.0);
+            else
+                entity.setAverageAllSubmitted(departmentStatistics.getTotalScore() / (double) departmentStatistics.getSubmittedPerson());
+            return entity;
+        }).collect(Collectors.toList());
+
+        WriteCellStyle style = new WriteCellStyle();
+        WriteFont font = new WriteFont();
+        font.setFontHeightInPoints((short) 11);
+        style.setWriteFont(font);
+
+        HorizontalCellStyleStrategy horizontalCellStyleStrategy =
+                new HorizontalCellStyleStrategy(style, style);
+
+        ExcelWriter excelWriter = null;
+        try {
+            excelWriter = EasyExcel.write(outputStream).build();
+            excelWriter.write(entities, EasyExcel.writerSheet("院系数据").head(DepartmentExportEntity.class).registerWriteHandler(horizontalCellStyleStrategy).build());
+        } finally {
+            if (excelWriter != null)
+                excelWriter.finish();
+        }
     }
 
     private List<StudentExportEntity> prepareStudentList(long department) {

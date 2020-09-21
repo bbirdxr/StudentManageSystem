@@ -1,7 +1,10 @@
 package cn.edu.seu.historycontest.service;
 
 import cn.edu.seu.historycontest.entity.Department;
+import cn.edu.seu.historycontest.payload.DepartmentStatistics;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -17,4 +20,5 @@ public interface DepartmentService extends IService<Department> {
     Integer getIdByName(String name);
     Integer getIdBySid(String sid);
 
+    List<DepartmentStatistics> getStatistics();
 }
