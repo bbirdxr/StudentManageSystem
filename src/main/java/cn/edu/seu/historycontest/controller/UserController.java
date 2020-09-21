@@ -133,8 +133,9 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public void importAndInsert(@CurrentUser UserPrincipal userPrincipal, @RequestParam(value = "file") MultipartFile upload) throws IOException {
         if (Constants.STATUS_ALL.equals(userPrincipal.getStatus()))
-        excelService.importStudent(-1, upload.getInputStream(), false);
-        excelService.importStudent(userPrincipal.getDepartment(), upload.getInputStream(), false);
+            excelService.importStudent(-1, upload.getInputStream(), false);
+        else
+            excelService.importStudent(userPrincipal.getDepartment(), upload.getInputStream(), false);
     }
 
     @PostMapping("student/import/cover")
@@ -142,7 +143,8 @@ public class UserController {
     public void importAndCover(@CurrentUser UserPrincipal userPrincipal, @RequestParam(value = "file") MultipartFile upload) throws IOException {
         if (Constants.STATUS_ALL.equals(userPrincipal.getStatus()))
             excelService.importStudent(-1, upload.getInputStream(), true);
-        excelService.importStudent(userPrincipal.getDepartment(), upload.getInputStream(), true);
+        else
+            excelService.importStudent(userPrincipal.getDepartment(), upload.getInputStream(), true);
     }
 
     @DeleteMapping("student/all")

@@ -140,7 +140,7 @@ public class PaperServiceImpl extends ServiceImpl<PaperMapper, Paper> implements
     public void submitPaper(UserPrincipal user, List<Integer> choiceAnswers, List<Integer> judgeAnswers) {
         Paper paper = getPaperFromUid(user.getId());
         long usedTime = new Date().getTime() - paper.getStartTime().getTime();
-        if (usedTime > Constants.TIME_LIMIT)
+        if (usedTime > Constants.TIME_LIMIT + Constants.TIME_DELAY_ALLOWABLE)
             throw new ForbiddenException("超时");
         if (usedTime < Constants.TIME_MIN)
             throw new ForbiddenException("答题时间过短，请认真答题");
@@ -184,6 +184,10 @@ public class PaperServiceImpl extends ServiceImpl<PaperMapper, Paper> implements
     @Override
     @Transactional
     public void calibrateTime(UserPrincipal userPrincipal, Date startTime) {
+        long usedTime = new Date().getTime() - startTime.getTime();
+        if (usedTime > Constants.TIME_DELAY_ALLOWABLE)
+            throw new ForbiddenException("服务器忙碌，请重新生成试卷");
+
         userPrincipal.setStatus(Constants.STATUS_STARTED);
         userService.updateById(userPrincipal.toUser());
 
