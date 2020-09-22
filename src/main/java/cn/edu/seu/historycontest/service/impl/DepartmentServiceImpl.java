@@ -53,15 +53,17 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
     @Override
     public Integer getIdBySid(String sid) {
-        Integer result = getIdBySid(sid, 2);
+        if ("JS319123".equals(sid))
+            System.out.println("1");
+        Integer result = getIdBySid(sid, 3);
         if (result != -1)
             return result;
-        return getIdBySid(sid, 3);
+        return getIdBySid(sid, 2);
     }
 
     private Integer getIdBySid(String sid, int prefixLength) {
         QueryWrapper<Department> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("prefix", sid.substring(0, prefixLength));
+        queryWrapper.like("prefix", "%" + sid.substring(0, prefixLength) + "%");
         Department department = getOne(queryWrapper);
         if (department != null)
             return department.getId();
