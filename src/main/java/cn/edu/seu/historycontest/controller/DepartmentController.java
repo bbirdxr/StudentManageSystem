@@ -54,6 +54,7 @@ public class DepartmentController {
         response.setCharacterEncoding("utf-8");
         response.setHeader("Content-disposition", "attachment;filename=data.xlsx");
         excelService.exportDepartmentStatistics(response.getOutputStream());
+        response.getOutputStream().flush();
     }
 }
 

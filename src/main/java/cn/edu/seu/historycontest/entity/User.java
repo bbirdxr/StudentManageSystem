@@ -41,7 +41,6 @@ public class User implements Serializable {
     /**
      * 密码/一卡通号
      */
-    @JsonIgnore
     private String password;
 
     private String name;

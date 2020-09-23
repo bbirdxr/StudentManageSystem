@@ -53,7 +53,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         queryWrapper.eq("role", Constants.ROLE_STUDENT);
         if (-1 != department)
             queryWrapper.eq("department", department);
-        return list(queryWrapper);
+        List<User> list = list(queryWrapper);
+        list.forEach(user -> user.setPassword(null));
+        return list;
     }
 
     @Override
@@ -234,14 +236,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public User getStudentBySid(String sid) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("sid", sid.replaceAll("\\s*", ""));
-        return getOne(queryWrapper);
+        User user = getOne(queryWrapper);
+        user.setPassword(null);
+        return user;
     }
 
     @Override
     public User getByCardId(String cardId) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("card_id", cardId.replaceAll("\\s*", ""));
-        return getOne(queryWrapper);
+        User user = getOne(queryWrapper);
+        user.setPassword(null);
+        return user;
     }
 
     @Override
@@ -262,7 +268,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public List<User> getAdminList() {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("role", Constants.ROLE_ADMIN);
-        return list(queryWrapper);
+        List<User> list = list(queryWrapper);
+        list.forEach(user -> user.setPassword(null));
+        return list;
     }
 
     @Override

@@ -127,6 +127,7 @@ public class UserController {
         if (Constants.STATUS_ALL.equals(userPrincipal.getStatus()))
             excelService.exportStudentList(-1, response.getOutputStream());
         else excelService.exportStudentList(userPrincipal.getDepartment(), response.getOutputStream());
+        response.getOutputStream().flush();
     }
 
     @PostMapping("student/import/insert")
