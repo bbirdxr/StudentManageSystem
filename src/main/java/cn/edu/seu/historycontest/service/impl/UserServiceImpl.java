@@ -237,7 +237,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("sid", sid.replaceAll("\\s*", ""));
         User user = getOne(queryWrapper);
-        user.setPassword(null);
+        if (user != null)
+            user.setPassword(null);
         return user;
     }
 
@@ -246,7 +247,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("card_id", cardId.replaceAll("\\s*", ""));
         User user = getOne(queryWrapper);
-        user.setPassword(null);
+        if (user != null)
+            user.setPassword(null);
         return user;
     }
 
