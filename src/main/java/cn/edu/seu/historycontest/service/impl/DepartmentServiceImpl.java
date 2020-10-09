@@ -53,8 +53,6 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
     @Override
     public Integer getIdBySid(String sid) {
-        if ("JS319123".equals(sid))
-            System.out.println("1");
         Integer result = getIdBySid(sid, 3);
         if (result != -1)
             return result;
