@@ -7,6 +7,7 @@ import cn.edu.seu.historycontest.entity.User;
 import cn.edu.seu.historycontest.exception.DepartmentNotMatchesException;
 import cn.edu.seu.historycontest.exception.ForbiddenException;
 import cn.edu.seu.historycontest.exception.UserAlreadyExistException;
+import cn.edu.seu.historycontest.mapper.MixedMapper;
 import cn.edu.seu.historycontest.mapper.UserMapper;
 import cn.edu.seu.historycontest.payload.GetPageResponse;
 import cn.edu.seu.historycontest.payload.StudentListResponse;
@@ -42,6 +43,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Autowired
     private PaperService paperService;
 
+    @Autowired
+    private MixedMapper mixedMapper;
+
     @Override
     public List<User> getAllStudent() {
         return getAllStudent(-1);
@@ -65,9 +69,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public List<StudentListResponse> getStudentList(long department) {
-        List<User> student = getAllStudent(department);
-        return student.stream().map(user ->
-                StudentListResponse.ofUser(user, paperService.getScore(user.getId()))).collect(Collectors.toList());
+        if (department == -1)
+            return mixedMapper.getAllDepartmentStudent();
+        return mixedMapper.getDepartmentStudent((int) department);
+//        List<User> student = getAllStudent(department);
+//        return student.stream().map(user ->
+//                StudentListResponse.ofUser(user, paperService.getScore(user.getId()))).collect(Collectors.toList());
     }
 
     @Override

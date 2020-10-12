@@ -3,10 +3,10 @@ package cn.edu.seu.historycontest.service.impl;
 import cn.edu.seu.historycontest.Constants;
 import cn.edu.seu.historycontest.entity.Department;
 import cn.edu.seu.historycontest.mapper.DepartmentMapper;
+import cn.edu.seu.historycontest.mapper.MixedMapper;
 import cn.edu.seu.historycontest.payload.DepartmentStatistics;
 import cn.edu.seu.historycontest.payload.StudentListResponse;
 import cn.edu.seu.historycontest.service.DepartmentService;
-import cn.edu.seu.historycontest.service.PaperService;
 import cn.edu.seu.historycontest.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -14,10 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -33,6 +29,9 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private MixedMapper mixedMapper;
 
     @Override
     public String getNameById(Integer id) {
@@ -62,9 +61,14 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
     private Integer getIdBySid(String sid, int prefixLength) {
         QueryWrapper<Department> queryWrapper = new QueryWrapper<>();
         queryWrapper.like("prefix", "%" + sid.substring(0, prefixLength) + "%");
-        Department department = getOne(queryWrapper);
-        if (department != null)
-            return department.getId();
+        try {
+            Department department = getOne(queryWrapper);
+            if (department != null)
+                return department.getId();
+        } catch (Exception e) {
+            int i = 1+ 1;
+        }
+
         return -1;
     }
 
@@ -74,7 +78,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
             DepartmentStatistics departmentStatistics = new DepartmentStatistics();
             departmentStatistics.setDepartment(department);
 
-            List<StudentListResponse> studentList = userService.getStudentList(department.getId());
+            List<StudentListResponse> studentList = mixedMapper.getDepartmentStudent(department.getId());
             departmentStatistics.setTotalPerson(studentList.size());
             departmentStatistics.setSubmittedPerson((int) studentList.stream()
                     .filter(studentListResponse -> Constants.STATUS_SUBMITTED.equals(studentListResponse.getStatus()))
