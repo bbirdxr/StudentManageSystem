@@ -3,7 +3,7 @@
 <mapper namespace="cn.edu.seu.historycontest.mapper.MixedMapper">
 
     <select id="getDepartmentStudent" resultType="StudentListResponse" parameterType="Integer">
-        SELECT u.*
+        SELECT u.*, p.score
         FROM hc_user u
                  LEFT JOIN hc_paper p on p.uid = u.id
         WHERE u.department = #{value}
@@ -11,7 +11,7 @@
     </select>
 
     <select id="getAllDepartmentStudent" resultType="StudentListResponse">
-        SELECT u.*
+        SELECT u.*, p.score
         FROM hc_user u
                  LEFT JOIN hc_paper p on p.uid = u.id
         WHERE u.role = 'ROLE_STUDENT'
